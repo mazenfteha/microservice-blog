@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  name        String
+  email       String    @unique
+  password    String
+  profileImage String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  posts       Post[]
+  comments    Comment[]
+  reactions   PostReaction[]
+  bookmarks   Bookmark[]
+  followers   Follow[]  @relation("UserFollowers")
+  following   Follow[]  @relation("UserFollowing")
+
+  @@map("users")
+}
+
+model Post {
+  id          Int           @id @default(autoincrement())
+  authorId    Int
+  title       String
+  content     String?
+  category    String?
+  tag         String?
+  status      String?
+  image       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  author      User          @relation(fields: [authorId], references: [id])
+  comments    Comment[]
+  reactions   PostReaction[]
+  bookmarks   Bookmark[]
+
+  @@map("posts")
+}
+
+model Comment {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  postId      Int
+  content     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id])
+  post        Post      @relation(fields: [postId], references: [id])
+
+  @@map("comments")
+}
+
+model PostReaction {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  postId      Int
+  reactionType String
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  post        Post      @relation(fields: [postId], references: [id])
+
+  @@map("post_reactions")
+}
+
+model Bookmark {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  postId      Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id])
+  post        Post      @relation(fields: [postId], references: [id])
+
+  @@map("bookmarks")
+}
+
+model Follow {
+  id          Int       @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  follower    User      @relation("UserFollowers", fields: [followerId], references: [id])
+  following   User      @relation("UserFollowing", fields: [followingId], references: [id])
+
+  @@map("follows")
+}
