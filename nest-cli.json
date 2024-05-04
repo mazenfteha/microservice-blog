@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/user/src",
+  "monorepo": true,
+  "root": "apps/user",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/user/tsconfig.app.json"
+  },
+  "projects": {
+    "user": {
+      "type": "application",
+      "root": "apps/user",
+      "entryFile": "main",
+      "sourceRoot": "apps/user/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/user/tsconfig.app.json"
+      }
+    },
+    "post": {
+      "type": "application",
+      "root": "apps/post",
+      "entryFile": "main",
+      "sourceRoot": "apps/post/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/post/tsconfig.app.json"
+      }
+    },
+    "comment": {
+      "type": "application",
+      "root": "apps/comment",
+      "entryFile": "main",
+      "sourceRoot": "apps/comment/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/comment/tsconfig.app.json"
+      }
+    },
+    "bookmark": {
+      "type": "application",
+      "root": "apps/bookmark",
+      "entryFile": "main",
+      "sourceRoot": "apps/bookmark/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/bookmark/tsconfig.app.json"
+      }
+    },
+    "comman": {
+      "type": "library",
+      "root": "libs/comman",
+      "entryFile": "index",
+      "sourceRoot": "libs/comman/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/comman/tsconfig.lib.json"
+      }
+    }
+  }
+}
