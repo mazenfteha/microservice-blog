@@ -1,6 +1,8 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { SigninDto, SignupDto } from '../dto';
+import { JwtGuard } from '../guard/jwt.guard';
+import { Request } from 'express';
 
 @Controller('/api/auth')
 export class UserController {
@@ -17,8 +19,15 @@ export class UserController {
     return this.userService.signin(dto);
   }
 
+  //protected Routes:
   @Post('signout')
   signout() {
     return this.userService.signout();
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('users')
+  getUsers(@Req() req: Request) {
+    return req.user;
   }
 }
