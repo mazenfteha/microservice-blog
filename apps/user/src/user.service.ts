@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { SigninDto, SignupDto } from '../dto';
+import { EditUserDto, SigninDto, SignupDto } from '../dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as argon from 'argon2'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -60,10 +60,6 @@ export class UserService {
         return this.signToken(user.id, user.email)
   }
 
-  async signout() {
-    return 'signout';
-  }
-
   async signToken(userId: number, email: string) : Promise<{access_token : string}>{
     const payload = {
         userId: userId,
@@ -79,6 +75,19 @@ export class UserService {
     return {
         access_token : token
     }
+  }
+
+  async editUser(userId: number, dto: EditUserDto) {
+    const user = await this.prisma.user.update({
+      where:{
+          id:userId,
+      },
+      data: {
+          ...dto,
+      },
+  });
+  delete user.password
+  return user;
   }
 }
 

@@ -1,35 +1,38 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { SigninDto, SignupDto } from '../dto';
+import { EditUserDto, SigninDto, SignupDto } from '../dto';
 import { JwtGuard } from '../guard/jwt.guard';
 import { GetUser } from '../decorator';
 import { User } from '@prisma/client';
 
-@Controller('/api/auth')
+@Controller('/api/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
 
-  @Post('signup')
+  @Post('auth/signup')
   signUp(@Body() dto : SignupDto) {
     return this.userService.signup(dto);
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('signin')
+  @Post('auth/signin')
   signin(@Body() dto : SigninDto) {
     return this.userService.signin(dto);
   }
 
   //protected Routes:
-  @Post('signout')
-  signout() {
-    return this.userService.signout();
+  @UseGuards(JwtGuard)
+  @Get('profile')
+  getUserProfile(@GetUser() user: User) {
+    return user;
   }
 
   @UseGuards(JwtGuard)
-  @Get('users')
-  getUsers(@GetUser() user: User) {
-    return user;
+  @Patch('edit/profile')
+  EditUserProfile(@GetUser('id') userId: number, @Body() dto: EditUserDto){
+    return this.userService.editUser(userId, dto)
   }
+
+  //Upload image profile
 }
