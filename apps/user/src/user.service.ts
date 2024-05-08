@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { EditUserDto, SigninDto, SignupDto } from '../dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as argon from 'argon2'
@@ -88,6 +88,43 @@ export class UserService {
   });
   delete user.password
   return user;
+  }
+
+  
+  async updateUserProfileImage(userId: number, imageBuffer: Buffer, filename: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: { profileImage: filename },
+    });
+
+    return updatedUser;
+
+  }
+
+  async deleteUserProfileImage(userId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: { profileImage: null },
+    });
+
+    return { message: 'Profile image deleted successfully' };
   }
 }
 

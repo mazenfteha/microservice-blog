@@ -1,9 +1,12 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, ParseFilePipeBuilder, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { EditUserDto, SigninDto, SignupDto } from '../dto';
 import { JwtGuard } from '../guard/jwt.guard';
 import { GetUser } from '../decorator';
 import { User } from '@prisma/client';
+import { FileInterceptor } from '@nestjs/platform-express';
+
+const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
 
 @Controller('/api/users')
 export class UserController {
@@ -35,4 +38,28 @@ export class UserController {
   }
 
   //Upload image profile
+  @UseGuards(JwtGuard)
+  @Post('upload/profile/image')
+  @UseInterceptors(FileInterceptor('file'))
+  public async uploadFile(
+    @GetUser('id') userId: number,
+    @UploadedFile(
+    new ParseFilePipeBuilder()
+        .addFileTypeValidator({ fileType: 'image/jpeg' })
+        .addMaxSizeValidator({ maxSize: MAX_PROFILE_PICTURE_SIZE_IN_BYTES })
+        .build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }),
+  ) file, ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+    return this.userService.updateUserProfileImage(userId, file.buffer, file.originalname);
+  }
+
+  // Delete Profile Image
+  @UseGuards(JwtGuard)
+  @Delete('delete/profile/image')
+  async deleteProfileImage(@GetUser('id') userId: number) {
+    return this.userService.deleteUserProfileImage(userId);
+  }
+
 }
