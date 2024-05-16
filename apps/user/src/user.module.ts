@@ -3,8 +3,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { JwtModule } from "@nestjs/jwt";
-import { JwtStrategy } from '../strategy';
+import { AuthModule } from '@app/comman/auth/auth.module';
 
 
 @Module({
@@ -13,9 +12,9 @@ import { JwtStrategy } from '../strategy';
       isGlobal: true
     }),
     PrismaModule,
-    JwtModule.register({})
+    AuthModule,
   ],
   controllers: [UserController],
-  providers: [UserService, JwtStrategy],
+  providers: [UserService],
 })
 export class UserModule {}
