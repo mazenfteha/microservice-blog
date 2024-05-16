@@ -1,7 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { CommentService } from './comment.service';
+import { JwtGuard } from '../../../libs/comman/src/';
 
-@Controller()
+@UseGuards(JwtGuard)
+@Controller('/api/comments')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 

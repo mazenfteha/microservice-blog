@@ -1,7 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { BookmarkService } from './bookmark.service';
+import { JwtGuard } from '../../../libs/comman/src/';
 
-@Controller()
+@UseGuards(JwtGuard)
+@Controller('/api/bookmarks')
 export class BookmarkController {
   constructor(private readonly bookmarkService: BookmarkService) {}
 
