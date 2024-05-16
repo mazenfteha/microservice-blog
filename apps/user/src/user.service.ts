@@ -5,13 +5,17 @@ import * as argon from 'argon2'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { CloudinaryService } from 'libs/comman/cloudinary/cloudinary.service';
+
+
 
 @Injectable()
 export class UserService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
-    private config: ConfigService
+    private config: ConfigService,
+    private readonly cloudinaryService: CloudinaryService,
     ){}
   async signup(dto: SignupDto) {
     try {
@@ -91,7 +95,8 @@ export class UserService {
   }
 
   
-  async updateUserProfileImage(userId: number, imageBuffer: Buffer, filename: string) {
+  
+  async updateUserProfileImage(userId: number, imageBuffer: Buffer) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -100,9 +105,12 @@ export class UserService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
+     // Upload image to Cloudinary
+    const result = await this.cloudinaryService.uploadImage(imageBuffer, 'user_images');
+
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },
-      data: { profileImage: filename },
+      data: { profileImage: result.url },
     });
 
     return updatedUser;
@@ -116,6 +124,12 @@ export class UserService {
 
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    // Delete image from Cloudinary if user has a profile image
+    if (user.profileImage) {
+      const publicId = user.profileImage
+      await this.cloudinaryService.deleteImage(publicId);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

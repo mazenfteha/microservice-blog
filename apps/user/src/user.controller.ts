@@ -52,7 +52,7 @@ export class UserController {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-    return this.userService.updateUserProfileImage(userId, file.buffer, file.originalname);
+    return this.userService.updateUserProfileImage(userId, file.buffer);
   }
 
   // Delete Profile Image
