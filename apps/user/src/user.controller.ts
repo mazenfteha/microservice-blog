@@ -1,8 +1,8 @@
 import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, ParseFilePipeBuilder, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
-import { EditUserDto, SigninDto, SignupDto } from '../dto';
+import { EditUserDto, SigninDto, SignupDto } from './dto';
 import { JwtGuard } from '../../../libs/comman/src';
-import { GetUser } from '../decorator';
+import { GetUser } from './decorator';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 

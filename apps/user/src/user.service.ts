@@ -1,11 +1,11 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { EditUserDto, SigninDto, SignupDto } from '../dto';
+import { EditUserDto, SigninDto, SignupDto } from './dto';
 import { PrismaService } from '@app/comman/prisma/prisma.module';
 import * as argon from 'argon2'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { CloudinaryService } from 'libs/comman/cloudinary/cloudinary.service';
+import { CloudinaryService } from '@app/comman/cloudinary/cloudinary.service';
 
 
 
