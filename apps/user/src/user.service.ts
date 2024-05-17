@@ -151,6 +151,10 @@ export class UserService {
       throw new ConflictException('You can only follow on behalf of yourself');
     }
 
+    if (dto.followerId === dto.followingId) {
+      throw new ConflictException("You can't follow yourself");
+    }
+
 
       const follower = await this.prisma.user.findUnique({
         where: { id: dto.followerId },
@@ -203,6 +207,10 @@ export class UserService {
         throw new ConflictException('You can only unfollow on behalf of yourself');
     }
 
+    if (dto.followerId === dto.followingId) {
+      throw new ConflictException("You can't unfollow yourself");
+    }
+
     try {
       const follower = await this.prisma.user.findUnique({
         where: { id: dto.followerId },
@@ -244,6 +252,78 @@ export class UserService {
     } else {
       throw new ConflictException('You are not following this user');
     }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getFollowers(userId: number) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+  
+      if (!user) {
+        throw new NotFoundException(`User with ID ${userId} not found`);
+      }
+
+      const followers = await this.prisma.follow.findMany({
+        where: {
+          followingId: userId,
+        },
+        include: {
+          follower: {
+            select : {
+              id: true,
+              name: true,
+              profileImage: true,
+            }
+          }
+        },
+      });
+
+      return followers.map(follow => ({
+        id: follow.follower.id,
+        username: follow.follower.name,
+        profilePicture: follow.follower.profileImage,
+      }));
+
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getFollowing(userId: number) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+  
+      if (!user) {
+        throw new NotFoundException(`User with ID ${userId} not found`);
+      }
+
+      const followings = await this.prisma.follow.findMany({
+        where: {
+          followerId: userId,
+        },
+        include: {
+          following: {
+            select : {
+              id: true,
+              name: true,
+              profileImage: true,
+            }
+          }
+        },
+      });
+
+      return followings.map(follow => ({
+        id: follow.following.id,
+        username: follow.following.name,
+        profilePicture: follow.following.profileImage,
+      }));
+
     } catch (error) {
       throw error
     }

@@ -72,9 +72,24 @@ export class UserController {
     return this.userService.createFollow(userId, dto);
   }
 
+  //unFollow
   @UseGuards(JwtGuard)
   @Post('unfollow')
   async deleteFollow( @GetUser('id') userId: number,@Body() dto: DeleteFollowDto){
     return this.userService.deleteFollow(userId, dto);
+  }
+
+  //Get followers
+  @UseGuards(JwtGuard)
+  @Get('get/followers')
+  async getFollowers(@GetUser('id') userId: number){
+    return this.userService.getFollowers(userId);
+  }
+
+  //Get following
+  @UseGuards(JwtGuard)
+  @Get('get/following')
+  async getFollowing(@GetUser('id') userId: number){
+    return this.userService.getFollowing(userId);
   }
 }
