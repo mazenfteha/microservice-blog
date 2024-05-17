@@ -6,6 +6,7 @@ import { GetUser } from './decorator';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateFollowDto } from './dto/create-follow.dto';
+import { DeleteFollowDto } from './dto/delete-follow.dto';
 
 const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
 
@@ -68,7 +69,12 @@ export class UserController {
   @UseGuards(JwtGuard)
   @Post('follow')
   async createFollow(@GetUser('id') userId: number,@Body() dto: CreateFollowDto){
-    return this.userService.createFollow(dto);
+    return this.userService.createFollow(userId, dto);
   }
 
+  @UseGuards(JwtGuard)
+  @Post('unfollow')
+  async deleteFollow( @GetUser('id') userId: number,@Body() dto: DeleteFollowDto){
+    return this.userService.deleteFollow(userId, dto);
+  }
 }

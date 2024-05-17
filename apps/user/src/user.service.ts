@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { CloudinaryService } from '@app/comman/cloudinary/cloudinary.service';
 import { CreateFollowDto } from './dto/create-follow.dto';
+import { DeleteFollowDto } from './dto/delete-follow.dto';
 
 
 
@@ -142,8 +143,14 @@ export class UserService {
     return { message: 'Profile image deleted successfully' };
   }
 
-  async createFollow(dto: CreateFollowDto) {
+  async createFollow(userId : number, dto: CreateFollowDto) {
     try {
+
+       // Ensure the user making the request is the follower
+    if (dto.followerId !== userId) {
+      throw new ConflictException('You can only follow on behalf of yourself');
+    }
+
 
       const follower = await this.prisma.user.findUnique({
         where: { id: dto.followerId },
@@ -184,6 +191,59 @@ export class UserService {
     });
     return follow;
 
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async deleteFollow(userId : number, dto: DeleteFollowDto) {
+    
+    // Ensure the user making the request is the follower
+    if (dto.followerId !== userId) {
+        throw new ConflictException('You can only unfollow on behalf of yourself');
+    }
+
+    try {
+      const follower = await this.prisma.user.findUnique({
+        where: { id: dto.followerId },
+      });
+
+      if (!follower) {
+        throw new NotFoundException(`User with ID ${dto.followerId} not found`);
+      }
+
+
+      const following = await this.prisma.user.findUnique({
+        where: { id: dto.followingId },
+      });
+
+      if (!following) {
+        throw new NotFoundException(`User with ID ${dto.followingId} not found`);
+      }
+
+    // Check if the follow relationship already exists
+    const existingFollow = await this.prisma.follow.findUnique({
+      where: {
+        followerId_followingId: {
+          followerId: dto.followerId,
+          followingId: dto.followingId,
+        },
+      },
+    });
+
+    if (existingFollow) {
+        await this.prisma.follow.delete({
+          where: {
+            followerId_followingId: {
+              followerId: dto.followerId,
+              followingId: dto.followingId,
+            },
+          },
+        });
+      return { message: "You are not following this user anymore" };
+    } else {
+      throw new ConflictException('You are not following this user');
+    }
     } catch (error) {
       throw error
     }
