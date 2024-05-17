@@ -5,6 +5,7 @@ import { JwtGuard } from '../../../libs/comman/src';
 import { GetUser } from './decorator';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateFollowDto } from './dto/create-follow.dto';
 
 const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
 
@@ -60,6 +61,14 @@ export class UserController {
   @Delete('delete/profile/image')
   async deleteProfileImage(@GetUser('id') userId: number) {
     return this.userService.deleteUserProfileImage(userId);
+  }
+
+  // Follow API
+  // Create Follow
+  @UseGuards(JwtGuard)
+  @Post('follow')
+  async createFollow(@GetUser('id') userId: number,@Body() dto: CreateFollowDto){
+    return this.userService.createFollow(dto);
   }
 
 }

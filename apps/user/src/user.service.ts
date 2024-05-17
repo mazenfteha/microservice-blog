@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { EditUserDto, SigninDto, SignupDto } from './dto';
 import { PrismaService } from '@app/comman/prisma/prisma.module';
 import * as argon from 'argon2'
@@ -6,6 +6,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { CloudinaryService } from '@app/comman/cloudinary/cloudinary.service';
+import { CreateFollowDto } from './dto/create-follow.dto';
 
 
 
@@ -139,6 +140,53 @@ export class UserService {
     });
 
     return { message: 'Profile image deleted successfully' };
+  }
+
+  async createFollow(dto: CreateFollowDto) {
+    try {
+
+      const follower = await this.prisma.user.findUnique({
+        where: { id: dto.followerId },
+      });
+
+      if (!follower) {
+        throw new NotFoundException(`User with ID ${dto.followerId} not found`);
+      }
+
+
+      const following = await this.prisma.user.findUnique({
+        where: { id: dto.followingId },
+      });
+
+      if (!following) {
+        throw new NotFoundException(`User with ID ${dto.followingId} not found`);
+      }
+      
+          // Check if the follow relationship already exists
+    const existingFollow = await this.prisma.follow.findUnique({
+      where: {
+        followerId_followingId: {
+          followerId: dto.followerId,
+          followingId: dto.followingId,
+        },
+      },
+    });
+
+    if (existingFollow) {
+      throw new ConflictException('You are already following this user');
+    }
+
+    const follow = await this.prisma.follow.create({
+      data: {
+        followerId: dto.followerId,
+        followingId: dto.followingId,
+      },
+    });
+    return follow;
+
+    } catch (error) {
+      throw error
+    }
   }
 }
 
