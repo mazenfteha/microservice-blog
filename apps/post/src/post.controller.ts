@@ -1,7 +1,6 @@
-import { BadRequestException, Body, Controller, Get, HttpStatus, ParseFilePipeBuilder, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PostService } from './post.service';
 import { JwtGuard } from '../../../libs/comman/src/';
-import { PrismaService } from '@app/comman/prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetUser } from 'apps/user/src/decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -13,27 +12,34 @@ const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
 @Controller('/api/posts')
 export class PostController {
   userService: any;
-  constructor(private readonly postService: PostService, private prisma: PrismaService,) {}
+  constructor(private readonly postService: PostService) {}
   
-  @Post('create')
-  createPost(@GetUser('id') userId: number,@Body() createPostDto: CreatePostDto) {
-    return this.postService.createPost(userId , createPostDto)
-  }
 
-  @Post('upload/image')
+  @Post('create')
   @UseInterceptors(FileInterceptor('file'))
-  public async uploadFile(
+  public async createPost(
     @GetUser('id') userId: number,
-    @UploadedFile(
-    new ParseFilePipeBuilder()
-        .addFileTypeValidator({ fileType: 'image/jpeg' })
-        .addMaxSizeValidator({ maxSize: MAX_PROFILE_PICTURE_SIZE_IN_BYTES })
-        .build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }),
-  ) file, ) {
-    if (!file) {
-      throw new BadRequestException('No file uploaded');
+    @Body() createPostDto: CreatePostDto,
+    @UploadedFile() file: Express.Multer.File, ) {
+
+    let imageUrl: string | undefined;
+
+    if (file) {
+      if (file.mimetype !== 'image/jpeg') {
+        throw new BadRequestException('Invalid file type. Only JPEG images are allowed.');
+      }
+      if (file.size > MAX_PROFILE_PICTURE_SIZE_IN_BYTES) {
+        throw new BadRequestException('File size exceeds the maximum limit of 1 MB.');
+      }
+      // Upload image and get URL
+      const result = await this.postService.uploadPostImage(userId, file.buffer);
+      imageUrl = result.url;
     }
-    return this.postService.uploadPostImage(userId, file.buffer);
+    // Create post with the image URL
+    return this.postService.createPost(userId, {
+      ...createPostDto,
+      imageUrl,
+    });
   }
 
   @Get()
