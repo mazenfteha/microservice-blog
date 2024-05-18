@@ -4,6 +4,7 @@ import { PostService } from './post.service';
 import { AuthModule } from '@app/comman/auth/auth.module';
 import { PrismaModule } from '@app/comman/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { CloudinaryModule } from '@app/comman/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true
     }),
     PrismaModule,
+    CloudinaryModule,
     AuthModule,
   ],
   controllers: [PostController],
