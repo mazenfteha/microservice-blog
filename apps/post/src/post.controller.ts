@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PostService } from './post.service';
 import { JwtGuard } from '../../../libs/comman/src/';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -11,7 +11,6 @@ const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
 @UseGuards(JwtGuard)
 @Controller('/api/posts')
 export class PostController {
-  userService: any;
   constructor(private readonly postService: PostService) {}
   
 
@@ -41,9 +40,20 @@ export class PostController {
       imageUrl,
     });
   }
-
+  
   @Get()
-  getHello(): string {
-    return this.postService.getHello();
+  GetAllPosts() {
+    return this.postService.getAllPosts()
   }
+  @Get('get/user/posts')
+  getUserPosts(@GetUser('id') userId: number) {
+    return this.postService.getUserPosts(userId)
+  }
+
+  @Get(':id')
+  getPostById(@GetUser('id') userId: number, @Param('id', ParseIntPipe) postId: number) {
+    return this.postService.getPostById(userId, postId)
+  }
+
+
 }
