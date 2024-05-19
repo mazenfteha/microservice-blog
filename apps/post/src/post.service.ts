@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { CreatePostDto } from './dto/create-post.dto';
 import { PrismaService } from '@app/comman/prisma/prisma.service';
 import { CloudinaryService } from '@app/comman/cloudinary/cloudinary.service';
+import { EditPostDto } from './dto/edit-post.dto';
 
 @Injectable()
 export class PostService {
@@ -172,5 +173,30 @@ export class PostService {
       where: { id: postId },
     });
     return { message: `Post with ID ${postId} deleted` };
+  }
+
+  
+  async editPostById(userId: number, postId: number, dto: EditPostDto) {
+    try {
+      const post = await this.prisma.post.findUnique({
+        where: { id: postId },
+      });
+      if (!post || post.authorId!== userId) {
+        throw new ForbiddenException(`Access denied`);
+      }
+
+      const updatedPost = await this.prisma.post.update({
+        where : {
+          id : postId
+        },
+        data : {
+          ...dto
+        }
+      })
+
+      return updatedPost
+    } catch (error) {
+      throw error
+    }
   }
 }

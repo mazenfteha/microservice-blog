@@ -1,9 +1,10 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PostService } from './post.service';
 import { JwtGuard } from '../../../libs/comman/src/';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetUser } from 'apps/user/src/decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { EditPostDto } from './dto/edit-post.dto';
 
 const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
 
@@ -54,6 +55,15 @@ export class PostController {
   getPostById(@GetUser('id') userId: number, @Param('id', ParseIntPipe) postId: number) {
     return this.postService.getPostById(userId, postId)
   }
+
+  @Patch(':id')
+  editPostById(
+    @GetUser('id') userId: number,
+    @Param('id', ParseIntPipe) postId: number,
+    @Body() dto : EditPostDto
+    ) {
+      return this.postService.editPostById(userId, postId, dto)
+    }
 
   @Delete(':id')
   deletePostById(@GetUser('id') userId: number, @Param('id', ParseIntPipe) postId: number) {
