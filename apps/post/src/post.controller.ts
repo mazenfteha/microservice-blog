@@ -5,6 +5,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { GetUser } from 'apps/user/src/decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { EditPostDto } from './dto/edit-post.dto';
+import { CreatePostReactionDto } from './dto/create-postReaction.dto';
 
 const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
 
@@ -70,4 +71,12 @@ export class PostController {
     return this.postService.deletePostById(userId, postId)
   }
 
+
+  @Post('reactions/create')
+  createReaction(
+    @GetUser('id') userId: number,
+    @Body() dto : CreatePostReactionDto
+  ){
+    return this.postService.createReaction(userId, dto.postId, dto.reactionType)
+  }
 }

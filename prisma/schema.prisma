@@ -61,11 +61,13 @@ model PostReaction {
   id          Int       @id @default(autoincrement())
   userId      Int
   postId      Int
-  reactionType String
+  reactionType ReactionType
   createdAt   DateTime  @default(now())
   user        User      @relation(fields: [userId], references: [id])
   post        Post      @relation(fields: [postId], references: [id])
 
+  @@unique([userId, postId])
+  
   @@map("post_reactions")
 }
 
@@ -93,4 +95,9 @@ model Follow {
   @@unique([followerId, followingId])
 
   @@map("follows")
+}
+
+enum ReactionType {
+  LIKE
+  DISLIKE
 }

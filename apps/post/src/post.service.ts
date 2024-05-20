@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PrismaService } from '@app/comman/prisma/prisma.service';
 import { CloudinaryService } from '@app/comman/cloudinary/cloudinary.service';
@@ -91,6 +91,17 @@ export class PostService {
               profileImage: true,
             },
           },
+          reactions: {
+            select: {
+              user: {
+                select: {
+                  name: true,
+                  profileImage: true
+                }
+              },
+              reactionType: true
+            }
+          },
           createdAt: true
         }
       });
@@ -132,6 +143,17 @@ export class PostService {
               profileImage: true,
             },
           },
+          reactions: {
+            select: {
+              user: {
+                select: {
+                  name: true,
+                  profileImage: true
+                }
+              },
+              reactionType: true
+            }
+          },
           createdAt: true
         }
       });
@@ -149,6 +171,27 @@ export class PostService {
           id : postId,
           author : {
             id : userId
+          },
+        },
+        select : {
+          authorId: true,
+          title: true,
+          content: true,
+          category : true,
+          tag: true,
+          status: true,
+          image: true,
+          createdAt : true,
+          reactions: {
+            select: {
+              user: {
+                select: {
+                  name: true,
+                  profileImage: true
+                }
+              },
+              reactionType: true
+            }
           }
         }
       })
@@ -195,6 +238,36 @@ export class PostService {
       })
 
       return updatedPost
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async createReaction(userId: number, postId: number, reactionType: 'LIKE' | 'DISLIKE') {
+    try {
+      if (reactionType !== 'LIKE' && reactionType !== 'DISLIKE') {
+        throw new BadRequestException('Invalid reaction type');
+      }
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const post = await this.prisma.post.findUnique({ where: { id: postId } });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    if (!post) {
+      throw new NotFoundException(`Post with ID ${postId} not found`);
+    }
+
+    const postReaction = await this.prisma.postReaction.upsert({
+      where: { userId_postId: { userId, postId } },
+      update: { reactionType },
+      create: { userId, postId, reactionType },
+    });
+
+    return postReaction
+
     } catch (error) {
       throw error
     }
