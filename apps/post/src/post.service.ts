@@ -272,4 +272,20 @@ export class PostService {
       throw error
     }
   }
+
+  async deleteReaction(userId: number, reactionId: number) {
+      // Find the reaction
+      const reaction = await this.prisma.postReaction.findUnique({
+        where: { id : reactionId },
+      });
+      if (!reaction) {
+        throw new NotFoundException('Reaction not found');
+      }
+      // Delete the reaction
+      await this.prisma.postReaction.delete({
+        where: { id : reactionId },
+      });
+  
+      return { message: 'Reaction deleted successfully' };
+  }
 }

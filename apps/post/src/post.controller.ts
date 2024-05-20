@@ -79,4 +79,12 @@ export class PostController {
   ){
     return this.postService.createReaction(userId, dto.postId, dto.reactionType)
   }
+
+  @Delete('reactions/:id')
+  deleteReaction(
+    @GetUser('id') userId: number,
+    @Param('id', ParseIntPipe) reactionId: number
+  ) {
+    return this.postService.deleteReaction(userId, reactionId)
+  }
 }
