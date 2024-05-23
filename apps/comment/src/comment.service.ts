@@ -1,6 +1,7 @@
 import { PrismaService } from '@app/comman/prisma/prisma.service';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { EditCommentDto } from './dto/edit-comment.dto';
 
 @Injectable()
 export class CommentService {
@@ -69,6 +70,26 @@ export class CommentService {
         },
       })
       return commentOnPost
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async editCommentById(userId: number, commentId: number, dto: EditCommentDto) {
+    try {
+      const comment = await this.prisma.comment.findUnique({ where: { id: commentId } });
+      if (!comment || comment.userId!== userId) {
+        throw new ForbiddenException(`Access denied`);
+      }
+      const updatedComment = await this.prisma.comment.update({
+        where : {
+          id : commentId
+        },
+        data : {
+          ...dto
+        }
+      })
+      return updatedComment;
     } catch (error) {
       throw error
     }
