@@ -102,6 +102,18 @@ export class PostService {
               reactionType: true
             }
           },
+          comments: {
+            select: {
+              user: {
+                select: {
+                  name: true,
+                  profileImage: true
+                }
+              },
+              content: true,
+              createdAt: true
+            }
+          },
           createdAt: true
         }
       });
@@ -154,6 +166,18 @@ export class PostService {
               reactionType: true
             }
           },
+          comments: {
+            select: {
+              user: {
+                select: {
+                  name: true,
+                  profileImage: true
+                }
+              },
+              content: true,
+              createdAt: true
+            }
+          },
           createdAt: true
         }
       });
@@ -192,7 +216,19 @@ export class PostService {
               },
               reactionType: true
             }
-          }
+          },
+          comments: {
+            select: {
+              user : {
+                select: {
+                  name: true,
+                  profileImage: true
+                }
+              },
+              content: true,
+              createdAt:true
+            }
+          },
         }
       })
       if (!post) {
