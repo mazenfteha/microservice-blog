@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { BookmarkService } from './bookmark.service';
 import { JwtGuard } from '../../../libs/comman/src/';
 import { GetUser } from 'apps/user/src/decorator';
@@ -12,5 +12,10 @@ export class BookmarkController {
   @Post('create')
   createBookmark(@GetUser('id') userId: number, @Body() dto : CreateBookmarkDto){
     return this.bookmarkService.createBookmark(userId, dto)
+  }
+
+  @Get()
+  getBookmarks(@GetUser('id') userId: number){
+    return this.bookmarkService.getBookmarks(userId)
   }
 }

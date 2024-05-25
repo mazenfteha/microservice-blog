@@ -31,4 +31,64 @@ export class BookmarkService {
       throw error
     }
   }
+
+  async getBookmarks(userId: number) {
+    try {
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+      if (!user) {
+        throw new NotFoundException(`User with ID ${userId} not found`);
+      }
+
+      const bookmarks = await this.prisma.bookmark.findMany({
+        where: {
+          userId,
+        },
+        select: {
+          post: {
+            select: {
+              title: true,
+              content: true,
+              category: true,
+              tag: true,
+              status: true,
+              image: true,
+              author: {
+                select: {
+                  name: true,
+                  profileImage: true,
+                }
+              },
+              reactions: {
+                select: {
+                  user: {
+                    select: {
+                      name: true,
+                      profileImage: true
+                    }
+                  },
+                  reactionType: true
+                }
+              },
+              comments: {
+                select: {
+                  user: {
+                    select: {
+                      name: true,
+                      profileImage: true
+                    }
+                  },
+                  content: true,
+                  createdAt: true
+                }
+              }
+            }
+          }
+        }
+      });
+      return bookmarks
+    } catch (error) {
+      throw error
+    }
+  }
 }
