@@ -1,5 +1,5 @@
 import { PrismaService } from '@app/comman/prisma/prisma.service';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBookmarkDto } from './dto/create-bookmark.dto';
 
 @Injectable()
@@ -18,6 +18,17 @@ export class BookmarkService {
   
       if (!post) {
         throw new NotFoundException(`Post with ID ${dto.postId} not found`);
+      }
+
+      const existingBookmark = await this.prisma.bookmark.findFirst({
+        where: {
+          userId: userId,
+          postId: dto.postId,
+        },
+      });
+
+      if (existingBookmark) {
+        throw new ForbiddenException('Bookmark already exists for this post');
       }
 
       await this.prisma.bookmark.create({
@@ -90,5 +101,22 @@ export class BookmarkService {
     } catch (error) {
       throw error
     }
+  }
+
+  async deleteBookmarkById(userId: number, bookmarkId: number) {
+    const bookmark = await this.prisma.bookmark.findUnique({
+      where: {
+        id: bookmarkId,
+      }
+    })
+    if(!bookmark || bookmark.userId !== userId){
+      throw new ForbiddenException(`Access denied`);
+    }
+    await this.prisma.bookmark.delete({
+      where: {
+        id: bookmarkId,
+      }
+    })
+    return { message: `Bookmark with ID ${bookmarkId} deleted` };
   }
 }
