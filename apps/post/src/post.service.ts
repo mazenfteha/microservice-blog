@@ -302,6 +302,15 @@ export class PostService {
       create: { userId, postId, reactionType },
     });
 
+    await this.prisma.notification.create({
+      data: {
+        userId: post.authorId,
+        type: 'NEW_REACTION',
+        postId,
+        reactionId: postReaction.id,
+      }
+    })
+
     return postReaction
 
     } catch (error) {

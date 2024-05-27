@@ -36,6 +36,15 @@ export class CommentService {
         },
       });
 
+      await this.prisma.notification.create({
+        data: {
+          userId: post.authorId,
+          type: 'NEW_COMMENT',
+          commentId: comment.id,
+          postId: post.id,
+        }
+      })
+
       return comment;
     } catch (error) {
       throw error;

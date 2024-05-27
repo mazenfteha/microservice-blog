@@ -193,6 +193,14 @@ export class UserService {
         followingId: dto.followingId,
       },
     });
+
+    await this.prisma.notification.create({
+      data: {
+        userId: dto.followingId,
+        type: 'NEW_FOLLOWER',
+        followId: follow.id
+      }
+    })
     return follow;
 
     } catch (error) {
