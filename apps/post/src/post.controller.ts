@@ -6,16 +6,23 @@ import { GetUser } from 'apps/user/src/decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { EditPostDto } from './dto/edit-post.dto';
 import { CreatePostReactionDto } from './dto/create-postReaction.dto';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+
 
 const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
 
-
+@ApiTags('Posts')
+@ApiBearerAuth()
 @UseGuards(JwtGuard)
 @Controller('/api/posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
   
 
+  @ApiOperation({ summary: 'create post' })
+  @ApiResponse({ status: 200, description: 'post created successfully'})
+  @ApiResponse({ status: 401, description: ' Unauthorized.' })
+  @ApiResponse({ status: 400, description: 'Invalid input.' })
   @Post('create')
   @UseInterceptors(FileInterceptor('file'))
   public async createPost(
@@ -43,20 +50,39 @@ export class PostController {
     });
   }
   
+  
+  @ApiOperation({ summary: 'get all posts' })
+  @ApiResponse({ status: 200, description: 'posts retrieved successfully'})
+  @ApiResponse({ status: 401, description: ' Unauthorized.' })
+  @ApiResponse({ status: 400, description: 'Invalid input.' })
   @Get()
   GetAllPosts() {
     return this.postService.getAllPosts()
   }
+
+  @ApiOperation({ summary: 'get all posts (user posts)' })
+  @ApiResponse({ status: 200, description: 'posts retrieved successfully'})
+  @ApiResponse({ status: 401, description: ' Unauthorized.' })
+  @ApiResponse({ status: 400, description: 'Invalid input.' })
   @Get('get/user/posts')
   getUserPosts(@GetUser('id') userId: number) {
     return this.postService.getUserPosts(userId)
   }
 
+  @ApiOperation({ summary: 'get post' })
+  @ApiResponse({ status: 200, description: 'post retrieved successfully'})
+  @ApiResponse({ status: 401, description: ' Unauthorized.' })
+  @ApiResponse({ status: 400, description: 'Invalid input.' })
   @Get(':id')
   getPostById(@GetUser('id') userId: number, @Param('id', ParseIntPipe) postId: number) {
     return this.postService.getPostById(userId, postId)
   }
 
+
+  @ApiOperation({ summary: 'update post' })
+  @ApiResponse({ status: 200, description: 'posts updated successfully'})
+  @ApiResponse({ status: 401, description: ' Unauthorized.' })
+  @ApiResponse({ status: 400, description: 'Invalid input.' })
   @Patch(':id')
   editPostById(
     @GetUser('id') userId: number,
@@ -66,12 +92,20 @@ export class PostController {
       return this.postService.editPostById(userId, postId, dto)
     }
 
+
+  @ApiOperation({ summary: 'delete post' })
+  @ApiResponse({ status: 200, description: 'posts deleted successfully'})
+  @ApiResponse({ status: 401, description: ' Unauthorized.' })
+  @ApiResponse({ status: 400, description: 'Invalid input.' })
   @Delete(':id')
   deletePostById(@GetUser('id') userId: number, @Param('id', ParseIntPipe) postId: number) {
     return this.postService.deletePostById(userId, postId)
   }
 
-
+  @ApiOperation({ summary: 'create reaction to post' })
+  @ApiResponse({ status: 200, description: 'reaction created successfully'})
+  @ApiResponse({ status: 401, description: ' Unauthorized.' })
+  @ApiResponse({ status: 400, description: 'Invalid input.' })
   @Post('reactions/create')
   createReaction(
     @GetUser('id') userId: number,
@@ -80,6 +114,10 @@ export class PostController {
     return this.postService.createReaction(userId, dto.postId, dto.reactionType)
   }
 
+  @ApiOperation({ summary: 'deleted reaction to post' })
+  @ApiResponse({ status: 200, description: 'reaction deleted successfully'})
+  @ApiResponse({ status: 401, description: ' Unauthorized.' })
+  @ApiResponse({ status: 400, description: 'Invalid input.' })
   @Delete('reactions/:id')
   deleteReaction(
     @GetUser('id') userId: number,
