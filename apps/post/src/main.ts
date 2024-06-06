@@ -2,9 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { PostModule } from './post.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(PostModule);
+  app.enableCors();
+  app.use(helmet());
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     forbidNonWhitelisted: true

@@ -4,6 +4,8 @@ import { CommentService } from './comment.service';
 import { AuthModule } from '@app/comman/auth/auth.module';
 import { PrismaModule } from '@app/comman/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -12,8 +14,17 @@ import { ConfigModule } from '@nestjs/config';
     }),
     PrismaModule,
     AuthModule,
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 10,
+    }]),
   ],
   controllers: [CommentController],
-  providers: [CommentService],
+  providers: [CommentService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+  ],
 })
 export class CommentModule {}
