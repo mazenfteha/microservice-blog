@@ -1,0 +1,960 @@
+{
+	"info": {
+		"_postman_id": "397a8732-688d-4fc7-a901-48d32cf4cdfb",
+		"name": "microservice-blog",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19931932"
+	},
+	"item": [
+		{
+			"name": "SignUp",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"leo messi\",\r\n    \"email\":\"leo@gmail.com\",\r\n    \"password\":\"123456789\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}:3000/api/users/auth/signup",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"auth",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SignIn",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTYwNjIzNjgsImV4cCI6MTcxNjA2NDE2OH0.i7saSCCKZ_rI97xRitTBQwZCJMKqODIW2T_JoflSUxU",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"Ronaldo@gmail.com\",\r\n    \"password\":\"123456789\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}:3000/api/users/auth/signin",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"auth",
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User Profile",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTY4Mzg1MzMsImV4cCI6MTcxNjkyNDkzM30.e4O5d4IOrBu9jCpIFKazvtOO8rZKxJZx8_eIXhuL2-Q",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3000/api/users/profile",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit User Profile",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoibWF6ZW5AZ21haWwuY29tIiwiaWF0IjoxNzE1MTE3OTIyLCJleHAiOjE3MTUxMTk3MjJ9.nnajRbwGqzhozvdaukBv4j8Cn9RfFcmdgTGY8oxp6V8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"mazen fteha\",\r\n    \"email\":\"mazen@gmail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}:3000/api/users/edit/profile",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"edit",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Upload Profile Pic",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoibWF6ZW5AZ21haWwuY29tIiwiaWF0IjoxNzE1OTY0NjQyLCJleHAiOjE3MTU5NjY0NDJ9.dKCoSGb5MSdAZ5XIGptKMUWTTxIPQ0gHQw8RsG-_fdM",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/LENOVO/Pictures/WhatsApp Image 2023-12-01 at 11.04.22_aa027f48.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{BaseUrl}}:3000/api/users/upload/profile/image",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"upload",
+						"profile",
+						"image"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Profile Pic",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoibWF6ZW5AZ21haWwuY29tIiwiaWF0IjoxNzE1OTY0NjQyLCJleHAiOjE3MTU5NjY0NDJ9.dKCoSGb5MSdAZ5XIGptKMUWTTxIPQ0gHQw8RsG-_fdM",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3000/api/users/delete/profile/image",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"delete",
+						"profile",
+						"image"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Follow ",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImVtYWlsIjoibGVvQGdtYWlsLmNvbSIsImlhdCI6MTcxNjgzODI2MywiZXhwIjoxNzE2OTI0NjYzfQ.P_N-LnQPYUri0643poA1u5-SWfG9i3GQYYOEPDfbsTk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"followerId\":4,\r\n    \"followingId\":3\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}:3000/api/users/follow",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"follow"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Un Follow",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTU5NzI3NjEsImV4cCI6MTcxNTk3NDU2MX0.xSKB-fA6JtkoSxSFQZtecDPF1_iE_W3_1Qi4vlk_No0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"followerId\":3,\r\n    \"followingId\":3\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}:3000/api/users/unfollow",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"unfollow"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Followers",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTY4Mzg1MzMsImV4cCI6MTcxNjkyNDkzM30.e4O5d4IOrBu9jCpIFKazvtOO8rZKxJZx8_eIXhuL2-Q",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3000/api/users/get/followers",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"get",
+						"followers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Following",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTU5NzI3NjEsImV4cCI6MTcxNTk3NDU2MX0.xSKB-fA6JtkoSxSFQZtecDPF1_iE_W3_1Qi4vlk_No0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3000/api/users/get/following",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"get",
+						"following"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Post ",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTY1Njg3MzYsImV4cCI6MTcxNjY1NTEzNn0.ztbDf2tEBBAHsrasrn1UsJvHhd7m2tBtM33P4a-45wc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/D:/ronaldo-850-jpeg-1693687478-1789-1693688039.jpg"
+						},
+						{
+							"key": "title",
+							"value": "Second post",
+							"contentType": "",
+							"type": "text"
+						},
+						{
+							"key": "category",
+							"value": "football",
+							"contentType": "",
+							"type": "text"
+						},
+						{
+							"key": "tags",
+							"value": "Ronaldo, Ballon dore",
+							"contentType": "",
+							"type": "text"
+						},
+						{
+							"key": "status",
+							"value": "Published",
+							"contentType": "",
+							"type": "text"
+						},
+						{
+							"key": "content",
+							"value": "Ronaldo is the best player in the world ",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{BaseUrl}}:3001/api/posts/create",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"posts",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User Posts",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTY1Njg3MzYsImV4cCI6MTcxNjY1NTEzNn0.ztbDf2tEBBAHsrasrn1UsJvHhd7m2tBtM33P4a-45wc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3001/api/posts/get/user/posts",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"posts",
+						"get",
+						"user",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Post By Id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTY1Njg3MzYsImV4cCI6MTcxNjY1NTEzNn0.ztbDf2tEBBAHsrasrn1UsJvHhd7m2tBtM33P4a-45wc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3001/api/posts/8",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"posts",
+						"8"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Posts (Public)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTY1Njg3MzYsImV4cCI6MTcxNjY1NTEzNn0.ztbDf2tEBBAHsrasrn1UsJvHhd7m2tBtM33P4a-45wc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3001/api/posts",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Post By Id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTY1Njg3MzYsImV4cCI6MTcxNjY1NTEzNn0.ztbDf2tEBBAHsrasrn1UsJvHhd7m2tBtM33P4a-45wc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3001/api/posts/8",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"posts",
+						"8"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Post By Id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTYxNDMzNTMsImV4cCI6MTcxNjE0NTE1M30.83kltZmNASqEmOhN9sMhN2lb-jEqE0BsE03brtVUMS0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\":\"first post but got updated with update API\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}:3001/api/posts/1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"posts",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Post Reaction (LIKE,DISLIKE)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImVtYWlsIjoibGVvQGdtYWlsLmNvbSIsImlhdCI6MTcxNjgzODI2MywiZXhwIjoxNzE2OTI0NjYzfQ.P_N-LnQPYUri0643poA1u5-SWfG9i3GQYYOEPDfbsTk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"postId\":10,\r\n    \"reactionType\":\"LIKE\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}:3001/api/posts/reactions/create",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"posts",
+						"reactions",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Post Reaction ",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTYyNDI3NzQsImV4cCI6MTcxNjI0NDU3NH0.AznYCHhPHfJcigG9wIaIS8EKF_xzs0EnFv0H6o9cOdg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3001/api/posts/reactions/1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"posts",
+						"reactions",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Comment",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImVtYWlsIjoibGVvQGdtYWlsLmNvbSIsImlhdCI6MTcxNjgzODI2MywiZXhwIjoxNzE2OTI0NjYzfQ.P_N-LnQPYUri0643poA1u5-SWfG9i3GQYYOEPDfbsTk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"postId\":10,\r\n    \"content\":\"I agree ,Ronaaldo is still best player in the world he is the REAL GOAT\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}:3002/api/comments/create",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3002",
+					"path": [
+						"api",
+						"comments",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Comment By Id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTY0MzExOTIsImV4cCI6MTcxNjUxNzU5Mn0.g6-Ja871sHfk9qc5GYBFewcMR2-hjYuom_Dwc-3fS44",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3002/api/comments/3",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3002",
+					"path": [
+						"api",
+						"comments",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete comment by Id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTY0MzExOTIsImV4cCI6MTcxNjUxNzU5Mn0.g6-Ja871sHfk9qc5GYBFewcMR2-hjYuom_Dwc-3fS44",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3002/api/comments/1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3002",
+					"path": [
+						"api",
+						"comments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Comment By Id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTY0MzExOTIsImV4cCI6MTcxNjUxNzU5Mn0.g6-Ja871sHfk9qc5GYBFewcMR2-hjYuom_Dwc-3fS44",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"content\":\"Updated comment\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}:3002/api/comments/3",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3002",
+					"path": [
+						"api",
+						"comments",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Bookmark",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTY3NDkwMTcsImV4cCI6MTcxNjgzNTQxN30.jGZIfepsFlaOqgCHVYQSfZ7lcOA1Ww5VnVYPhPxe9ik",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"postId\":10\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}:3003/api/bookmarks/create",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3003",
+					"path": [
+						"api",
+						"bookmarks",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User Bookmarks ",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTY3NDkwMTcsImV4cCI6MTcxNjgzNTQxN30.jGZIfepsFlaOqgCHVYQSfZ7lcOA1Ww5VnVYPhPxe9ik",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3003/api/bookmarks",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3003",
+					"path": [
+						"api",
+						"bookmarks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete bookmark By id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTY3NDkwMTcsImV4cCI6MTcxNjgzNTQxN30.jGZIfepsFlaOqgCHVYQSfZ7lcOA1Ww5VnVYPhPxe9ik",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3003/api/bookmarks/2",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3003",
+					"path": [
+						"api",
+						"bookmarks",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User Notifications",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTcwNDI2OTMsImV4cCI6MTcxNzEyOTA5M30.bBH7Xpr5odwijhExMP2T44VED4oqBPXPM3Ym-gwo1Ok",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3004/api/notifications",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3004",
+					"path": [
+						"api",
+						"notifications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Marked notification on seen ",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiUm9uYWxkb0BnbWFpbC5jb20iLCJpYXQiOjE3MTcwNDI2OTMsImV4cCI6MTcxNzEyOTA5M30.bBH7Xpr5odwijhExMP2T44VED4oqBPXPM3Ym-gwo1Ok",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}:3004/api/notifications/1/seen",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"port": "3004",
+					"path": [
+						"api",
+						"notifications",
+						"1",
+						"seen"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
