@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { UserModule } from './../src/user.module';
 import { PrismaClient } from '@prisma/client';
+
 
 
 describe('UserController (e2e)', () => {
@@ -15,41 +16,188 @@ describe('UserController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+      }),
+    )
     await app.init();
     await prisma.$connect();
+    await prisma.user.deleteMany();
   });
 
   afterAll(async () => {
+    await prisma.user.deleteMany();
     await app.close();
     await prisma.$disconnect();
-  }, 30000);
-
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/api/users')
-      .expect(200)
-      .expect('Hello World!');
   });
 
-  //Register a new user
-  it('POST req should create a user', async () => {
-    const dto = {
-      name: 'John Doe',
-      email: 'john651512@gmail.com',
-      password: 'strongpassword123'
-    };
+  describe('Auth', () => {
+    //Register a new user
+    describe('SignUp', () => {
+      it('should create a user', async () => {
+        const dto = {
+          name: 'John Doe',
+          email: 'john@gmail.com',
+          password: 'strongpassword123'
+        };
+    
+        const response = await request(app.getHttpServer())
+          .post('/api/users/auth/signup')
+          .send(dto)
+          .expect(201);
+    
+        expect(response.body).toEqual({
+          id: expect.any(Number),
+          name: 'John Doe',
+          email: 'john@gmail.com',
+          password: undefined,
+          profileImage: null
+        });
+      });
+    
+      it('should not create a user (with same email)', async () => {
+        const dto = {
+          name: 'Jane Doe',
+          email: 'john@example.com', // Same email as in the previous test
+          password: 'anotherstrongpassword123'
+        };
+    
+        await request(app.getHttpServer())
+        .post('/api/users/auth/signup')
+        .send({
+          name: 'John Doe',
+          email: 'john@example.com',
+          password: 'strongpassword123'
+        })
+        .expect(201);
+    
+        const response = await request(app.getHttpServer())
+          .post('/api/users/auth/signup')
+          .send(dto)
+          .expect(400);
+    
+        expect(response.body).toEqual({
+          message: [
+            'Password must be between 8 and 20 characters'
+          ],
+          error: 'Bad Request',
+          statusCode: 400
+        });
+      });
 
-    const response = await request(app.getHttpServer())
-      .post('/api/users/auth/signup')
-      .send(dto)
-      .expect(201);
+      it('should throw an error if the name is empty', async () => {
+        const dto = {
+          email: 'john@example.com',
+          password: 'strongpassword123'
+        };
+    
+        const response = await request(app.getHttpServer())
+          .post('/api/users/auth/signup')
+          .send(dto)
+          .expect(400);
+    
+        expect(response.body).toEqual({
+          error: 'Bad Request',
+          statusCode: 400,
+          message: [
+            'name should not be empty',
+            'name must be a string'
+          ]
+        });
+      });
 
-    expect(response.body).toEqual({
-      id: expect.any(Number),
-      name: 'John Doe',
-      email: 'john651512@gmail.com',
-      password: undefined,
-      profileImage: null
-    });
-  });
+      it('should throw an error if the email is empty', async () => {
+        const dto = {
+          name: 'John Doe',
+          password: 'strongpassword123'
+        };
+    
+        const response = await request(app.getHttpServer())
+          .post('/api/users/auth/signup')
+          .send(dto)
+          .expect(400);
+    
+        expect(response.body).toEqual({
+          message: [
+            'email should not be empty',
+            'Email must be valid'
+          ],
+          error: 'Bad Request',
+          statusCode: 400
+        });
+      })
+
+      it('should throw an error if the password is empty', async () => {
+        const dto = {
+          name: 'John Doe',
+          email: 'john@example.com'
+        };
+    
+        const response = await request(app.getHttpServer())
+          .post('/api/users/auth/signup')
+          .send(dto)
+          .expect(400);
+    
+        expect(response.body).toEqual({
+          message:[
+            'Password must be between 8 and 20 characters',
+            'password should not be empty',
+            'password must be a string',
+          ],
+          error: 'Bad Request',
+          statusCode: 400
+        });
+      })
+
+      it('should throw an error if the request body is empty', async () => {
+        const response = await request(app.getHttpServer())
+        .post('/api/users/auth/signup')
+        .send({})
+        .expect(400);
+  
+      expect(response.body).toEqual({
+        message: [
+          'name should not be empty',
+          'name must be a string',
+          'email should not be empty',
+          'Email must be valid',
+          'Password must be between 8 and 20 characters',
+          'password should not be empty',
+          'password must be a string',
+        ],
+        error: 'Bad Request',
+        statusCode: 400
+      });
+      })
+    })
+    describe('SignIn', () => {
+      it('it should sign in', async () =>{
+
+        const signupDto = {
+          name: 'John Doe',
+          email: 'john@example.com',
+          password: 'strongpassword123'
+        };
+    
+        await request(app.getHttpServer())
+          .post('/api/users/auth/signup')
+          .send(signupDto)
+          .expect(201);
+
+        const dto = {
+          email: 'john@example.com',
+          password: 'strongpassword123'
+        };
+        const response = await request(app.getHttpServer())
+        .post('/api/users/auth/signin')
+        .send(dto)
+        .expect(200);
+
+        expect(response.body).toHaveProperty('access_token');
+        expect(typeof response.body.access_token).toBe('string');
+      }
+    )
+    })
+  })
 });

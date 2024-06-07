@@ -39,7 +39,7 @@ export class UserService {
     } catch (error) {
       if(error instanceof PrismaClientKnownRequestError){
         if(error.code === 'P2002'){
-          throw new ForbiddenException('Email is alredy in use')
+          throw new ForbiddenException('Email is already in use')
         }
       }
       throw error

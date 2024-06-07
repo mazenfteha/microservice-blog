@@ -54,6 +54,8 @@ $ npm run test
 # e2e tests
 $ npm run test:e2e
 
+$ npx dotenv -e .env.test prisma db push
+
 # test coverage
 $ npm run test:cov
 ```
