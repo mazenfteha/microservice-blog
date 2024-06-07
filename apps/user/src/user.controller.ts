@@ -140,4 +140,10 @@ export class UserController {
   async getFollowing(@GetUser('id') userId: number){
     return this.userService.getFollowing(userId);
   }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  sayHello(){
+    return 'Hello World!';
+  }
 }

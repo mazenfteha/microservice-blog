@@ -1,11 +1,11 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { EditUserDto, SigninDto, SignupDto } from './dto';
-import { PrismaService } from '@app/comman/prisma/prisma.module';
+import { PrismaService } from '../../../libs/comman/src/prisma/prisma.service';
 import * as argon from 'argon2'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { CloudinaryService } from '@app/comman/cloudinary/cloudinary.service';
+import { CloudinaryService } from '../../../libs/comman/src/cloudinary/cloudinary.service';
 import { CreateFollowDto } from './dto/create-follow.dto';
 import { DeleteFollowDto } from './dto/delete-follow.dto';
 
@@ -33,6 +33,8 @@ export class UserService {
       })
       delete user.password
       //return the saved user
+      delete user.createdAt
+      delete user.updatedAt
       return user;
     } catch (error) {
       if(error instanceof PrismaClientKnownRequestError){

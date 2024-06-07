@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { PrismaModule } from '@app/comman/prisma/prisma.module';
+import { PrismaModule } from '../../../libs/comman/src/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { AuthModule } from '@app/comman/auth/auth.module';
-import { CloudinaryModule } from '@app/comman/cloudinary/cloudinary.module';
+import { AuthModule } from '../../../libs/comman/src/auth/auth.module';
+import { CloudinaryModule } from '../../../libs/comman/src/cloudinary/cloudinary.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
