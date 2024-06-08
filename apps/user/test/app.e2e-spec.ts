@@ -3,6 +3,9 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { UserModule } from './../src/user.module';
 import { PrismaClient } from '@prisma/client';
+import { join } from 'path';
+
+
 
 
 
@@ -314,4 +317,215 @@ describe('UserController (e2e)', () => {
     })
     })
   })
+  describe('User Profile', () => {
+    it('should retrieve the user profile', async () => {
+      const signupDto = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+  
+      await request(app.getHttpServer())
+        .post('/api/users/auth/signup')
+        .send(signupDto)
+        .expect(201);
+  
+      const signinDto = {
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+  
+      const signinResponse = await request(app.getHttpServer())
+        .post('/api/users/auth/signin')
+        .send(signinDto)
+        .expect(200);
+
+      const { access_token } = signinResponse.body;
+
+      const profileResponse = await request(app.getHttpServer())
+      .get('/api/users/profile')
+      .set('Authorization', `Bearer ${access_token}`)
+      .expect(200);
+
+      expect(profileResponse.body).toEqual({
+        id: expect.any(Number),
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: undefined,
+        profileImage: null, 
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String)
+      });
+    })
+
+    it('should not retrieve the user profile if token not correct', async () => {
+      const signupDto = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+  
+      await request(app.getHttpServer())
+        .post('/api/users/auth/signup')
+        .send(signupDto)
+        .expect(201);
+  
+      const signinDto = {
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+  
+      await request(app.getHttpServer())
+        .post('/api/users/auth/signin')
+        .send(signinDto)
+        .expect(200);
+
+      const profileResponse = await request(app.getHttpServer())
+      .get('/api/users/profile')
+      .set('Authorization', `Bearer invalid_token_here`)
+      .expect(401);
+
+      expect(profileResponse.body).toEqual({
+        message: "Unauthorized",
+        statusCode: 401
+      });
+    })
+
+    it('should update the user profile', async () => {
+      // First, create a user to sign in with
+      const signupDto = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+  
+      await request(app.getHttpServer())
+        .post('/api/users/auth/signup')
+        .send(signupDto)
+        .expect(201);
+  
+      // Sign in to get the access token
+      const signinDto = {
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+  
+      const signinResponse = await request(app.getHttpServer())
+        .post('/api/users/auth/signin')
+        .send(signinDto)
+        .expect(200);
+  
+      const { access_token } = signinResponse.body;
+  
+      const editDto = {
+        name: 'John Updated',
+      };
+  
+      const updateResponse = await request(app.getHttpServer())
+        .patch('/api/users/edit/profile')
+        .set('Authorization', `Bearer ${access_token}`)
+        .send(editDto)
+        .expect(200);
+  
+      expect(updateResponse.body).toEqual({
+        id: expect.any(Number),
+        name: 'John Updated',
+        email: 'john@example.com',
+        password: undefined,
+        profileImage: null,
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String)
+      });
+    });
+  
+    it('should not update the user profile if token not correct', async () => {
+      const updateResponse = await request(app.getHttpServer())
+        .patch('/api/users/edit/profile')
+        .set('Authorization', `Bearer invalid_token_here`)
+        .send({ name: 'John Updated' })
+        .expect(401);
+  
+      expect(updateResponse.body).toEqual({
+        message: "Unauthorized",
+        statusCode: 401
+      });
+    });
+
+  })
+
+  describe('User Profile Image Upload', () => {
+    it('should upload and update user profile image', async () => {
+      // First, create a user to sign in with
+      const signupDto = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+  
+      await request(app.getHttpServer())
+        .post('/api/users/auth/signup')
+        .send(signupDto)
+        .expect(201);
+  
+      // Sign in to get the access token
+      const signinDto = {
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+  
+      const signinResponse = await request(app.getHttpServer())
+        .post('/api/users/auth/signin')
+        .send(signinDto)
+        .expect(200);
+  
+      const { access_token } = signinResponse.body;
+  
+      const imagePath = join(__dirname, '../../../docs/ronaldo-850-jpeg-1693687478-1789-1693688039.jpg'); // Replace with a valid path
+      const response = await request(app.getHttpServer())
+        .post('/api/users/upload/profile/image')
+        .set('Authorization', `Bearer ${access_token}`)
+        .attach('file', imagePath)
+        .expect(201);
+
+      expect(response.body).toHaveProperty('profileImage');
+      expect(response.body.profileImage).toMatch(/cloudinary\.com/);
+    }, 30000);
+
+    it('should return an error if no file is uploaded', async () => {
+      const signupDto = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+  
+      await request(app.getHttpServer())
+        .post('/api/users/auth/signup')
+        .send(signupDto)
+        .expect(201);
+  
+      // Sign in to get the access token
+      const signinDto = {
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+  
+      const signinResponse = await request(app.getHttpServer())
+        .post('/api/users/auth/signin')
+        .send(signinDto)
+        .expect(200);
+  
+      const { access_token } = signinResponse.body;
+      const response = await request(app.getHttpServer())
+        .post('/api/users/upload/profile/image')
+        .set('Authorization', `Bearer ${access_token}`)
+        .expect(422);
+
+      expect(response.body).toEqual({
+        statusCode: 422,
+        message: 'File is required',
+        error: 'Unprocessable Entity',
+      });
+    });
+
+  });
 });
