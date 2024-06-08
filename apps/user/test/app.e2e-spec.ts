@@ -198,6 +198,120 @@ describe('UserController (e2e)', () => {
         expect(typeof response.body.access_token).toBe('string');
       }
     )
+    it('should not sign in if the email is empty', async () => {
+      const signupDto = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+  
+      await request(app.getHttpServer())
+        .post('/api/users/auth/signup')
+        .send(signupDto)
+        .expect(201);
+
+      const dto = {
+        password: 'strongpassword123'
+      };
+      const response = await request(app.getHttpServer())
+      .post('/api/users/auth/signin')
+      .send(dto)
+      .expect(400);
+
+      expect(response.body).toEqual({
+        message: [
+          'email should not be empty',
+          'Email must be valid'
+        ],
+        error: 'Bad Request',
+        statusCode: 400
+      });
+
+    })
+    it('should not sign in if the password is empty', async () => {
+      const signupDto = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+  
+      await request(app.getHttpServer())
+        .post('/api/users/auth/signup')
+        .send(signupDto)
+        .expect(201);
+
+      const dto = {
+        email: 'john@example.com'
+      };
+      const response = await request(app.getHttpServer())
+      .post('/api/users/auth/signin')
+      .send(dto)
+      .expect(400);
+
+      expect(response.body).toEqual({
+        message: [
+          "Password must be between 8 and 20 characters",
+          "password should not be empty",
+          "password must be a string"
+        ],
+        error: 'Bad Request',
+        statusCode: 400
+      });
+    })
+    it('should not sign in if the email is not match', async () => {
+      const signupDto = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+      await request(app.getHttpServer())
+        .post('/api/users/auth/signup')
+        .send(signupDto)
+        .expect(201);
+
+        const dto = {
+          email: 'john@example.com1',
+          password: 'strongpassword123'
+        };
+        const response = await request(app.getHttpServer())
+        .post('/api/users/auth/signin')
+        .send(dto)
+        .expect(400);
+
+        expect(response.body).toEqual({
+          message: [
+            'Email must be valid'
+          ],
+          error: 'Bad Request',
+          statusCode: 400
+        });
+    })
+    it('should not sign in if the password is not match',async  () => {
+      const signupDto = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+      await request(app.getHttpServer())
+        .post('/api/users/auth/signup')
+        .send(signupDto)
+        .expect(201);
+
+        const dto = {
+          email: 'john@example.com',
+          password: 'strongpassword1234'
+        };
+        const response = await request(app.getHttpServer())
+        .post('/api/users/auth/signin')
+        .send(dto)
+        .expect(403);
+
+        expect(response.body).toEqual({
+          message: 'Credentials inccorect',
+          error: 'Forbidden',
+          statusCode: 403
+        });
+    })
     })
   })
 });
