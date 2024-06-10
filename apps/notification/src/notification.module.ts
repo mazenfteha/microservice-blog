@@ -6,6 +6,7 @@ import { PrismaModule } from '@app/comman/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { RabbitMQModule } from '@app/comman/rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { APP_GUARD } from '@nestjs/core';
     }),
     PrismaModule,
     AuthModule,
+    RabbitMQModule,
     ThrottlerModule.forRoot([{
       ttl: 60000,
       limit: 10,

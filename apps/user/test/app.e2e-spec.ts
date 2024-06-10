@@ -7,8 +7,6 @@ import { join } from 'path';
 
 
 
-
-
 describe('UserController (e2e)', () => {
   let app: INestApplication;
   const prisma = new PrismaClient();

@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { CloudinaryService } from '../../../libs/comman/src/cloudinary/cloudinary.service';
 import { CreateFollowDto } from './dto/create-follow.dto';
 import { DeleteFollowDto } from './dto/delete-follow.dto';
+import { RabbitMQService } from '@app/comman/rabbitmq/rabbitmq.service';
 
 
 
@@ -18,6 +19,8 @@ export class UserService {
     private jwt: JwtService,
     private config: ConfigService,
     private readonly cloudinaryService: CloudinaryService,
+    private readonly rabbitMQService: RabbitMQService
+
     ){}
   async signup(dto: SignupDto) {
     try {
@@ -35,6 +38,12 @@ export class UserService {
       //return the saved user
       delete user.createdAt
       delete user.updatedAt
+
+      await this.rabbitMQService.sendMessage(
+        'user.created',
+        JSON.stringify(user)
+      );
+
       return user;
     } catch (error) {
       if(error instanceof PrismaClientKnownRequestError){

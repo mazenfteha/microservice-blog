@@ -1,10 +1,35 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '@app/comman/prisma/prisma.service';
+import { RabbitMQService } from '@app/comman/rabbitmq/rabbitmq.service';
+import * as amqp from 'amqplib';
+
 
 
 @Injectable()
-export class NotificationService {
-  constructor(private prisma: PrismaService){}
+export class NotificationService implements OnModuleInit {
+  constructor(
+    private prisma: PrismaService,
+    private readonly rabbitMQService: RabbitMQService
+  ){}
+  async onModuleInit() {
+    await this.rabbitMQService.consumeMessages('user.created', this.handleUserCreated.bind(this));
+  }
+
+  private handleUserCreated(msg: amqp.Message) {
+    const user = JSON.parse(msg.content.toString());
+    this.sendWelcomeNotification(user);
+  }
+
+  private  async sendWelcomeNotification(user: any) {
+    console.log(`Sending welcome notification to ${user.email}`);
+    await this.prisma.notification.create({
+      data: {
+        userId: user.id,
+        type: 'NEW_REACTION',
+        createdAt: new Date(),
+      }
+    });
+  }
 
   async getUserNotifications(userId: number) {
     try {
