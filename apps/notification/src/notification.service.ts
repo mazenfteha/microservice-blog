@@ -13,7 +13,61 @@ export class NotificationService implements OnModuleInit {
   ){}
   async onModuleInit() {
     await this.rabbitMQService.consumeMessages('user.created', this.handleUserCreated.bind(this));
+    await this.rabbitMQService.consumeMessages('post.created', this.handlePostCreated.bind(this));
+
   }
+
+  private async handlePostCreated(msg: amqp.Message) {
+    const post = JSON.parse(msg.content.toString());
+    await this.notifyFollowers(post);
+  }
+
+  private async notifyFollowers(post: any) {
+
+    const postWithAuthor = await this.prisma.post.findUnique({
+      where: { id: post.id },
+      select: {
+        author: {
+          select: {
+            email: true // Selecting the author's email
+          }
+        }
+      }
+    });
+  
+    if (!postWithAuthor) {
+      console.error("Post not found");
+      return;
+    }
+  
+    const authorEmail = postWithAuthor.author.email;
+
+    const followers = await this.prisma.user.findMany({
+      where: {
+        followers: {
+          some: {
+            followingId: post.authorId
+          }
+        }
+      },
+      select: {
+        id: true, // Select the id of the followers
+        email: true
+      }
+    });
+    followers.forEach(async follower => {
+      console.log(`Notifying follower ${follower.email} about new post by ${authorEmail}`);
+      // Implementation to send notification
+      await this.prisma.notification.create({
+        data: {
+        userId: follower.id,
+        content: `New post by ${authorEmail}`,
+        type: 'NEW_POST'
+        }
+      });
+    });
+  }
+
 
   private handleUserCreated(msg: amqp.Message) {
     const user = JSON.parse(msg.content.toString());
@@ -25,7 +79,8 @@ export class NotificationService implements OnModuleInit {
     await this.prisma.notification.create({
       data: {
         userId: user.id,
-        type: 'NEW_REACTION',
+        content: 'Welcome to our service',
+        type: 'WELCOME',
         createdAt: new Date(),
       }
     });

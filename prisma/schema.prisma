@@ -105,6 +105,7 @@ model Follow {
 model Notification {
   id          Int       @id @default(autoincrement())
   userId      Int
+  content     String?
   type        NotificationType
   postId      Int?
   commentId   Int?
@@ -125,6 +126,8 @@ enum NotificationType {
   NEW_FOLLOWER
   NEW_COMMENT
   NEW_REACTION
+  NEW_POST
+  WELCOME
 }
 
 

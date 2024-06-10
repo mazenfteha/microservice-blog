@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CloudinaryModule } from '@app/comman/cloudinary/cloudinary.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { RabbitMQModule } from '@app/comman/rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { APP_GUARD } from '@nestjs/core';
     PrismaModule,
     CloudinaryModule,
     AuthModule,
+    RabbitMQModule,
     ThrottlerModule.forRoot([{
       ttl: 60000,
       limit: 10,

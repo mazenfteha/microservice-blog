@@ -3,12 +3,14 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { PrismaService } from '@app/comman/prisma/prisma.service';
 import { CloudinaryService } from '@app/comman/cloudinary/cloudinary.service';
 import { EditPostDto } from './dto/edit-post.dto';
+import { RabbitMQService } from '@app/comman/rabbitmq/rabbitmq.service';
 
 @Injectable()
 export class PostService {
   constructor(
     private prisma: PrismaService,
     private readonly cloudinaryService: CloudinaryService,
+    private readonly rabbitMQService: RabbitMQService
     ){}
 
 
@@ -37,6 +39,7 @@ export class PostService {
           },
         },
         select : {
+          id:true,
           title : true,
           content : true,
           category : true,
@@ -53,6 +56,9 @@ export class PostService {
           createdAt: true
         }
       });
+
+      await this.rabbitMQService.sendMessage('post.created', JSON.stringify(post));
+
       return post;
     } catch (error) {
       throw error;
