@@ -317,6 +317,9 @@ export class PostService {
       }
     })
 
+    await this.rabbitMQService.sendMessage('react.created', JSON.stringify(post));
+
+
     return postReaction
 
     } catch (error) {

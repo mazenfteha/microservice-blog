@@ -15,8 +15,57 @@ export class NotificationService implements OnModuleInit {
     await this.rabbitMQService.consumeMessages('user.created', this.handleUserCreated.bind(this));
     await this.rabbitMQService.consumeMessages('post.created', this.handlePostCreated.bind(this));
     await this.rabbitMQService.consumeMessages('comment.created', this.handleCommentCreated.bind(this));
+    await this.rabbitMQService.consumeMessages('react.created', this.handleReactCreated.bind(this));
 
   }
+
+  private handleReactCreated(msg: amqp.Message) {
+    const post = JSON.parse(msg.content.toString());
+    this.notifyFollowerUsers(post);
+  }
+
+  private async notifyFollowerUsers(post: any) {
+    // Fetch the email of the user who liked the post
+  const userWhoLiked = await this.prisma.user.findUnique({
+    where: { id: post.userId },
+    select: { email: true }
+  });
+
+  if (!userWhoLiked) {
+    console.error("User who liked the post not found");
+    return;
+  }
+
+  const userWhoLikedEmail = userWhoLiked.email;
+
+  // Fetch the followers of the user who liked the post
+  const followers = await this.prisma.user.findMany({
+    where: {
+      followers: {
+        some: {
+          followingId: post.userId
+        }
+      }
+    },
+    select: {
+      id: true, // Select the id of the followers
+      email: true
+    }
+  });
+
+  // Notify each follower
+  followers.forEach(async follower => {
+    console.log(`Notifying follower ${follower.email} that the post was liked by ${userWhoLikedEmail}`);
+    await this.prisma.notification.create({
+      data: {
+        userId: follower.id,
+        content: `The post was liked by ${userWhoLikedEmail}`,
+        type: 'NEW_REACTION'
+      }
+    });
+  });
+  }
+
 
   private handleCommentCreated(msg: amqp.Message) {
     const comment = JSON.parse(msg.content.toString());
@@ -24,6 +73,17 @@ export class NotificationService implements OnModuleInit {
   }
 
   private async notifyUsersWhoCommented(comment: any) {
+    const userWhoCommeted = await this.prisma.user.findUnique({
+      where: { id: comment.userId },
+      select: { email: true }
+    });
+  
+    if (!userWhoCommeted) {
+      console.error("User who commented the post not found");
+      return;
+    }
+  
+    const userWhoCommentEmail = userWhoCommeted.email;
     // First Fetch all distinct users who have commented on the same post, excluding the current commenter
     const commenters = await this.prisma.comment.findMany({
       where: {
@@ -49,7 +109,7 @@ export class NotificationService implements OnModuleInit {
       await this.prisma.notification.create({
         data: {
           userId: commenter.user.id,
-          content: `New comment on post you commented on`,
+          content: `New comment on post you commented on by ${userWhoCommentEmail}`,
           type: 'NEW_COMMENT'
         },
       });
