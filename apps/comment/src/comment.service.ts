@@ -2,10 +2,15 @@ import { PrismaService } from '@app/comman/prisma/prisma.service';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { EditCommentDto } from './dto/edit-comment.dto';
+import { RabbitMQService } from '@app/comman/rabbitmq/rabbitmq.service';
 
 @Injectable()
 export class CommentService {
-  constructor(private prisma: PrismaService){}
+  constructor(
+    private prisma: PrismaService,
+    private readonly rabbitMQService: RabbitMQService
+
+  ){}
 
   async createComment(userId: number , createCommentDto: CreateCommentDto) {
     try {
@@ -44,6 +49,8 @@ export class CommentService {
           postId: post.id,
         }
       })
+
+      await this.rabbitMQService.sendMessage('comment.created', JSON.stringify(comment));
 
       return comment;
     } catch (error) {

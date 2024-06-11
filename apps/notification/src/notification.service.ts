@@ -14,7 +14,46 @@ export class NotificationService implements OnModuleInit {
   async onModuleInit() {
     await this.rabbitMQService.consumeMessages('user.created', this.handleUserCreated.bind(this));
     await this.rabbitMQService.consumeMessages('post.created', this.handlePostCreated.bind(this));
+    await this.rabbitMQService.consumeMessages('comment.created', this.handleCommentCreated.bind(this));
 
+  }
+
+  private handleCommentCreated(msg: amqp.Message) {
+    const comment = JSON.parse(msg.content.toString());
+    this.notifyUsersWhoCommented(comment);
+  }
+
+  private async notifyUsersWhoCommented(comment: any) {
+    // First Fetch all distinct users who have commented on the same post, excluding the current commenter
+    const commenters = await this.prisma.comment.findMany({
+      where: {
+        postId: comment.postId,
+        NOT: {
+          userId: comment.userId // Exclude the current commenter
+        }
+      },
+      select: {
+        user: {
+          select: {
+            id: true,
+            email: true
+          }
+        }
+      },
+      distinct: ['userId']
+    })
+
+    // Notify each user 
+    commenters.forEach(async (commenter) => {
+      console.log(`Notifying ${commenter.user.email} about a new comment on post ${comment.postId}`);
+      await this.prisma.notification.create({
+        data: {
+          userId: commenter.user.id,
+          content: `New comment on post you commented on`,
+          type: 'NEW_COMMENT'
+        },
+      });
+    })
   }
 
   private async handlePostCreated(msg: amqp.Message) {
