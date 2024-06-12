@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards,UseInterceptors } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { JwtGuard } from '../../../libs/comman/src/';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { GetUser } from 'apps/user/src/decorator';
 import { EditCommentDto } from './dto/edit-comment.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('Comments')
 @ApiBearerAuth()
@@ -27,6 +28,7 @@ export class CommentController {
   @ApiResponse({ status: 200, description: 'comment retrived successfully'})
   @ApiResponse({ status: 401, description: ' Unauthorized.' })
   @ApiResponse({ status: 400, description: 'Invalid input.' })
+  @UseInterceptors(CacheInterceptor)
   @Get(':id')
   getPostById(@GetUser('id') userId: number, @Param('id', ParseIntPipe) commentId: number) {
     return this.commentService.getCommentById(userId, commentId)

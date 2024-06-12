@@ -1,9 +1,10 @@
-import { Body, Controller, Get,Delete, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get,Delete, Param, ParseIntPipe, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { BookmarkService } from './bookmark.service';
 import { JwtGuard } from '../../../libs/comman/src/';
 import { GetUser } from 'apps/user/src/decorator';
 import { CreateBookmarkDto } from './dto/create-bookmark.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('bookmarks')
 @ApiBearerAuth()
@@ -25,6 +26,7 @@ export class BookmarkController {
   @ApiResponse({ status: 200, description: 'bookmarks retrived successfully'})
   @ApiResponse({ status: 401, description: ' Unauthorized.' })
   @ApiResponse({ status: 400, description: 'Invalid input.' })
+  @UseInterceptors(CacheInterceptor)
   @Get()
   getBookmarks(@GetUser('id') userId: number){
     return this.bookmarkService.getBookmarks(userId)

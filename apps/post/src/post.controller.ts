@@ -7,6 +7,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { EditPostDto } from './dto/edit-post.dto';
 import { CreatePostReactionDto } from './dto/create-postReaction.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 
 const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
@@ -55,6 +56,7 @@ export class PostController {
   @ApiResponse({ status: 200, description: 'posts retrieved successfully'})
   @ApiResponse({ status: 401, description: ' Unauthorized.' })
   @ApiResponse({ status: 400, description: 'Invalid input.' })
+  @UseInterceptors(CacheInterceptor)
   @Get()
   GetAllPosts() {
     return this.postService.getAllPosts()
@@ -64,6 +66,7 @@ export class PostController {
   @ApiResponse({ status: 200, description: 'posts retrieved successfully'})
   @ApiResponse({ status: 401, description: ' Unauthorized.' })
   @ApiResponse({ status: 400, description: 'Invalid input.' })
+  @UseInterceptors(CacheInterceptor)
   @Get('get/user/posts')
   getUserPosts(@GetUser('id') userId: number) {
     return this.postService.getUserPosts(userId)
@@ -73,6 +76,7 @@ export class PostController {
   @ApiResponse({ status: 200, description: 'post retrieved successfully'})
   @ApiResponse({ status: 401, description: ' Unauthorized.' })
   @ApiResponse({ status: 400, description: 'Invalid input.' })
+  @UseInterceptors(CacheInterceptor)
   @Get(':id')
   getPostById(@GetUser('id') userId: number, @Param('id', ParseIntPipe) postId: number) {
     return this.postService.getPostById(userId, postId)

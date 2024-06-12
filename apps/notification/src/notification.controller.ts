@@ -1,8 +1,9 @@
-import { Controller, Get, Param, ParseIntPipe, Patch, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Patch, UseGuards, UseInterceptors } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { JwtGuard } from '@app/comman';
 import { GetUser } from 'apps/user/src/decorator';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('notifications')
 @ApiBearerAuth()
@@ -15,6 +16,7 @@ export class NotificationController {
   @ApiResponse({ status: 200, description: 'notifications retrived successfully'})
   @ApiResponse({ status: 401, description: ' Unauthorized.' })
   @ApiResponse({ status: 400, description: 'Invalid input.' })
+  @UseInterceptors(CacheInterceptor)
   @Get()
   async getUserNotifications(@GetUser('id') userId: number) {
     return this.notificationService.getUserNotifications(userId);
