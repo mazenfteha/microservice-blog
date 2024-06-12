@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger, MiddlewareConsumer,NestModule } from '@nestjs/common';
 import { BookmarkController } from './bookmark.controller';
 import { BookmarkService } from './bookmark.service';
 import { AuthModule } from '@app/comman/auth/auth.module';
@@ -8,6 +8,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore }  from 'cache-manager-redis-yet';
+import { LoggingMiddleware } from '../../../libs/comman/src/middlewares/logging.middleware';
+
 
 @Module({
   imports: [
@@ -29,11 +31,15 @@ import { redisStore }  from 'cache-manager-redis-yet';
     }]),
   ],
   controllers: [BookmarkController],
-  providers: [BookmarkService,
+  providers: [BookmarkService, Logger,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard
     }
   ],
 })
-export class BookmarkModule {}
+export class BookmarkModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggingMiddleware).forRoutes('*')
+  }
+}

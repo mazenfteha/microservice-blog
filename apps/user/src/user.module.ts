@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger, MiddlewareConsumer,NestModule } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { PrismaModule } from '../../../libs/comman/src/prisma/prisma.module';
@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RabbitMQModule } from '@app/comman/rabbitmq/rabbitmq.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore }  from 'cache-manager-redis-yet';
+import { LoggingMiddleware } from '../../../libs/comman/src/middlewares/logging.middleware';
 
 
 @Module({
@@ -34,11 +35,15 @@ import { redisStore }  from 'cache-manager-redis-yet';
     }]),
   ],
   controllers: [UserController],
-  providers: [UserService, 
+  providers: [UserService,Logger, 
     {
     provide: APP_GUARD,
     useClass: ThrottlerGuard
     }
   ],
 })
-export class UserModule {}
+export class UserModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggingMiddleware).forRoutes('*')
+  }
+}

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger, MiddlewareConsumer,NestModule } from '@nestjs/common';
 import { PostController } from './post.controller';
 import { PostService } from './post.service';
 import { AuthModule } from '@app/comman/auth/auth.module';
@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RabbitMQModule } from '@app/comman/rabbitmq/rabbitmq.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore }  from 'cache-manager-redis-yet';
+import { LoggingMiddleware } from '../../../libs/comman/src/middlewares/logging.middleware';
 
 @Module({
   imports: [
@@ -33,11 +34,15 @@ import { redisStore }  from 'cache-manager-redis-yet';
     }]),
   ],
   controllers: [PostController],
-  providers: [PostService, 
+  providers: [PostService, Logger,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard
     }
   ],
 })
-export class PostModule {}
+export class PostModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggingMiddleware).forRoutes('*')
+  }
+}

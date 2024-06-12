@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger, MiddlewareConsumer,NestModule } from '@nestjs/common';
 import { NotificationController } from './notification.controller';
 import { NotificationService } from './notification.service';
 import { AuthModule } from '@app/comman/auth/auth.module';
@@ -9,6 +9,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { RabbitMQModule } from '@app/comman/rabbitmq/rabbitmq.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore }  from 'cache-manager-redis-yet';
+import { LoggingMiddleware } from '../../../libs/comman/src/middlewares/logging.middleware';
+
 
 @Module({
   imports: [
@@ -31,11 +33,15 @@ import { redisStore }  from 'cache-manager-redis-yet';
     }]),
   ],
   controllers: [NotificationController],
-  providers: [NotificationService,
+  providers: [NotificationService,Logger,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard
     }
   ],
 })
-export class NotificationModule {}
+export class NotificationModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggingMiddleware).forRoutes('*')
+  }
+}
