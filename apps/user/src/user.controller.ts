@@ -8,6 +8,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateFollowDto } from './dto/create-follow.dto';
 import { DeleteFollowDto } from './dto/delete-follow.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
 
@@ -41,6 +42,7 @@ export class UserController {
   @ApiResponse({ status: 401, description: ' Unauthorized.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   @UseGuards(JwtGuard)
+  @UseInterceptors(CacheInterceptor)
   @Get('profile')
   getUserProfile(@GetUser() user: User) {
     return user;
@@ -124,6 +126,7 @@ export class UserController {
   @ApiResponse({ status: 401, description: ' Unauthorized.' })
   @ApiResponse({ status: 404, description: 'Invalid input.' })
   @UseGuards(JwtGuard)
+  @UseInterceptors(CacheInterceptor)
   @Get('get/followers')
   async getFollowers(@GetUser('id') userId: number){
     return this.userService.getFollowers(userId);
@@ -136,6 +139,7 @@ export class UserController {
   @ApiResponse({ status: 401, description: ' Unauthorized.' })
   @ApiResponse({ status: 404, description: 'Invalid input.' })
   @UseGuards(JwtGuard)
+  @UseInterceptors(CacheInterceptor)
   @Get('get/following')
   async getFollowing(@GetUser('id') userId: number){
     return this.userService.getFollowing(userId);

@@ -302,7 +302,6 @@ export class UserService {
       });
 
       return followers.map(follow => ({
-        id: follow.follower.id,
         username: follow.follower.name,
         profilePicture: follow.follower.profileImage,
       }));
@@ -338,7 +337,6 @@ export class UserService {
       });
 
       return followings.map(follow => ({
-        id: follow.following.id,
         username: follow.following.name,
         profilePicture: follow.following.profileImage,
       }));
