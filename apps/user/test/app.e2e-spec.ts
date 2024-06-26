@@ -373,14 +373,17 @@ describe('UserController (e2e)', () => {
         password: 'strongpassword123'
       };
   
-      await request(app.getHttpServer())
-        .post('/api/users/auth/signin')
-        .send(signinDto)
-        .expect(200);
+      const signinResponse = await request(app.getHttpServer())
+      .post('/api/users/auth/signin')
+      .send(signinDto)
+      .expect(200);
+
+        const { access_token } = signinResponse.body;
+
 
       const profileResponse = await request(app.getHttpServer())
       .get('/api/users/profile')
-      .set('Authorization', `Bearer invalid_token_here`)
+      .set('Authorization', `Bearer Bearer ${access_token}+51651`)
       .expect(401);
 
       expect(profileResponse.body).toEqual({
@@ -437,9 +440,19 @@ describe('UserController (e2e)', () => {
     });
   
     it('should not update the user profile if token not correct', async () => {
+      const signinDto = {
+        email: 'john@example.com',
+        password: 'strongpassword123'
+      };
+      const signinResponse = await request(app.getHttpServer())
+      .post('/api/users/auth/signin')
+      .send(signinDto)
+      .expect(200);
+
+    const { access_token } = signinResponse.body;
       const updateResponse = await request(app.getHttpServer())
         .patch('/api/users/edit/profile')
-        .set('Authorization', `Bearer invalid_token_here`)
+        .set('Authorization', `Bearer ${access_token}asdsad`)
         .send({ name: 'John Updated' })
         .expect(401);
   
