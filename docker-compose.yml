@@ -1,0 +1,129 @@
+version: '3.8'
+services:
+  user:
+    build:
+      context: .
+      dockerfile: ./apps/user/Dockerfile
+      target: development
+    command: npm run start:dev
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    container_name: user
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+  post:
+    build:
+      context: .
+      dockerfile: ./apps/post/Dockerfile
+      target: development
+    command: npm run start:dev post
+    env_file:
+      - .env
+    ports:
+      - "3001:3001"
+    container_name: post
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq  
+  comment:
+    build:
+      context: .
+      dockerfile: ./apps/comment/Dockerfile
+      target: development
+    command: npm run start:dev comment
+    env_file:
+      - .env
+    ports:
+      - "3002:3002"
+    container_name: comment
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+  bookmark:
+    build:
+      context: .
+      dockerfile: ./apps/bookmark/Dockerfile
+      target: development
+    command: npm run start:dev bookmark
+    env_file:
+      - .env
+    container_name: bookmark
+    ports:
+      - "3003:3003"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+  notification:
+    build:
+      context: .
+      dockerfile: ./apps/notification/Dockerfile
+      target: development
+    command: npm run start:dev notification
+    env_file:
+      - .env
+    container_name: notification
+    ports:
+      - "3004:3004"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+  postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+      POSTGRES_DB: prisma
+    ports:
+      - '5432:5432'
+    container_name: postgresql
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  redis:
+    image: redis:alpine
+    ports:
+      - '6379:6379'
+    container_name: redis
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - '5672:5672'
+    container_name: rabbitmq
+  nginx-proxy:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    depends_on:
+      - user
+      - post
+      - comment
+      - bookmark
+      - notification
+    ports:
+        - '80:80'
+    container_name: nginx-proxy
+
+volumes:
+  postgres_data:
