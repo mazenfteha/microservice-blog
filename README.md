@@ -143,7 +143,7 @@ The `ValidationPipe` makes use of the powerful class-validator package and it
 ## API documentation
 
 - Each service has it’s own secure Swagger API docs endpoints ‘api/docs’
-- postman collection found [here]('./docs/microservice-blog.postman_collection.json')
+- postman collection found in ```docs folder```
 
 ## **Reverse Proxy**
 
@@ -154,7 +154,7 @@ The `ValidationPipe` makes use of the powerful class-validator package and it
 
 - Each microservice is deployed into a docker container.
 - Each service has a Docker image. All images are deployed into containers managed through the docker-compose file, which contains PostgreSQL , RabbitMQ , Redis and NGINX .
-- Docker commands found [here]('./dockerREADME.md')
+- Docker commands found in ```dockerREADME.md``` file
 
 ## Installation
 
