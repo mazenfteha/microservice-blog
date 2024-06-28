@@ -125,6 +125,7 @@ export class UserService {
       where: { id: userId },
       data: { profileImage: result.url },
     });
+    delete updatedUser.password
 
     return updatedUser;
 
