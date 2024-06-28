@@ -8,6 +8,9 @@ RUN npm install
 
 COPY . .
 
+COPY ../prisma ./prisma
+RUN npx prisma generate
+
 RUN npm run build notification
 
 FROM node:alpine as production
