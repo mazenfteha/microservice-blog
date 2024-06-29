@@ -204,6 +204,7 @@ export class PostService {
           },
         },
         select : {
+          id : true,
           authorId: true,
           title: true,
           content: true,
@@ -330,7 +331,7 @@ export class PostService {
   async deleteReaction(userId: number, reactionId: number) {
       // Find the reaction
       const reaction = await this.prisma.postReaction.findUnique({
-        where: { id : reactionId },
+        where: { id : reactionId , userId},
       });
       if (!reaction) {
         throw new NotFoundException('Reaction not found');

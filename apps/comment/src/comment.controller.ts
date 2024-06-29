@@ -25,12 +25,12 @@ export class CommentController {
   }
 
   @ApiOperation({ summary: 'get comment' })
-  @ApiResponse({ status: 200, description: 'comment retrived successfully'})
+  @ApiResponse({ status: 200, description: 'comment retrieved successfully'})
   @ApiResponse({ status: 401, description: ' Unauthorized.' })
   @ApiResponse({ status: 400, description: 'Invalid input.' })
   @UseInterceptors(CacheInterceptor)
   @Get(':id')
-  getPostById(@GetUser('id') userId: number, @Param('id', ParseIntPipe) commentId: number) {
+  getCommentById(@GetUser('id') userId: number, @Param('id', ParseIntPipe) commentId: number) {
     return this.commentService.getCommentById(userId, commentId)
   }
 
