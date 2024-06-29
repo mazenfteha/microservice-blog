@@ -301,7 +301,7 @@ export class UserService {
           }
         },
       });
-
+      
       return followers.map(follow => ({
         username: follow.follower.name,
         profilePicture: follow.follower.profileImage,

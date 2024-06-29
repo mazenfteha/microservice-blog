@@ -147,6 +147,7 @@ export class UserController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @ApiResponse({ status: 200, description: 'Hello , world!' })
   sayHello(){
     return 'Hello World!';
   }
