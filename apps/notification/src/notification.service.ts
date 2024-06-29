@@ -24,10 +24,10 @@ export class NotificationService implements OnModuleInit {
     this.notifyFollowerUsers(post);
   }
 
-  private async notifyFollowerUsers(post: any) {
+  private async notifyFollowerUsers(postReaction: any) {
     // Fetch the email of the user who liked the post
   const userWhoLiked = await this.prisma.user.findUnique({
-    where: { id: post.userId },
+    where: { id: postReaction.userId },
     select: { email: true }
   });
 
@@ -43,7 +43,7 @@ export class NotificationService implements OnModuleInit {
     where: {
       followers: {
         some: {
-          followingId: post.userId
+          followingId: postReaction.userId
         }
       }
     },
@@ -128,7 +128,7 @@ export class NotificationService implements OnModuleInit {
       select: {
         author: {
           select: {
-            email: true // Selecting the author's email
+            email: true, // Selecting the author's email
           }
         }
       }
@@ -145,7 +145,7 @@ export class NotificationService implements OnModuleInit {
       where: {
         followers: {
           some: {
-            followingId: post.authorId
+            followingId: post.author.id,
           }
         }
       },
@@ -154,6 +154,7 @@ export class NotificationService implements OnModuleInit {
         email: true
       }
     });
+    
     followers.forEach(async follower => {
       console.log(`Notifying follower ${follower.email} about new post by ${authorEmail}`);
       // Implementation to send notification
