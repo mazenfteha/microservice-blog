@@ -9,9 +9,14 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
     async onModuleInit() {
         while(this.connection == null) {
             // replace localhost with rabbitmq container name
-            this.connection = await amqp.connect('amqp://localhost');
-            this.connection.on('connect', () => console.log('Connected to RabbitMQ'));
-            this.connection.on('disconnect', (err) => console.log('Disconnected from RabbitMQ', err));
+            try {
+                this.connection = await amqp.connect('amqp://localhost');
+                this.connection.on('connect', () => console.log('Connected to RabbitMQ'));
+                this.connection.on('disconnect', (err) => console.log('Disconnected from RabbitMQ', err));   
+            } catch (error) {
+                console.error('Failed to connect to RabbitMQ, retrying in 5 seconds...', error);
+                await new Promise(resolve => setTimeout(resolve, 5000));
+            }
         }
         
     }
