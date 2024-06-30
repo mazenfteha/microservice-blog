@@ -30,6 +30,8 @@
     "@nestjs/swagger": "^7.3.1",
     "@nestjs/throttler": "^5.1.2",
     "@prisma/client": "^5.13.0",
+    "@types/amqplib": "^0.10.5",
+    "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.4",
     "argon2": "^0.40.1",
     "cache-manager": "^5.6.1",

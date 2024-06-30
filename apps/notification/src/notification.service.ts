@@ -12,6 +12,7 @@ export class NotificationService implements OnModuleInit {
     private readonly rabbitMQService: RabbitMQService
   ){}
   async onModuleInit() {
+    
     await this.rabbitMQService.consumeMessages('user.created', this.handleUserCreated.bind(this));
     await this.rabbitMQService.consumeMessages('post.created', this.handlePostCreated.bind(this));
     await this.rabbitMQService.consumeMessages('comment.created', this.handleCommentCreated.bind(this));

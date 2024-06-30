@@ -1,49 +1,50 @@
-import { Module, Logger, MiddlewareConsumer,NestModule } from '@nestjs/common';
+import { Module, Logger, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { PrismaModule } from '../../../libs/comman/src/prisma/prisma.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from '../../../libs/comman/src/auth/auth.module';
 import { CloudinaryModule } from '../../../libs/comman/src/cloudinary/cloudinary.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { RabbitMQModule } from '@app/comman/rabbitmq/rabbitmq.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore }  from 'cache-manager-redis-yet';
 import { LoggingMiddleware } from '../../../libs/comman/src/middlewares/logging.middleware';
-
+import redisConfig from '@app/comman/rabbitmq/redis.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
     }),
     PrismaModule,
     AuthModule,
     CloudinaryModule,
     RabbitMQModule,
-    CacheModule.register({
-      isGlobal: true,
-      ttl: 6 * 10000,
-      store: redisStore, 
-      host: 'localhost',
-      port: 6379,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 10,
+      },
+    ]),
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: redisConfig,
+      inject: [ConfigService],
     }),
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 10,
-    }]),
   ],
   controllers: [UserController],
-  providers: [UserService,Logger, 
+  providers: [
+    UserService,
+    Logger,
     {
-    provide: APP_GUARD,
-    useClass: ThrottlerGuard
-    }
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class UserModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggingMiddleware).forRoutes('*')
+    consumer.apply(LoggingMiddleware).forRoutes('*');
   }
 }

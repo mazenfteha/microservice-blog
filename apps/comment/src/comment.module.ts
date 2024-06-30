@@ -3,13 +3,13 @@ import { CommentController } from './comment.controller';
 import { CommentService } from './comment.service';
 import { AuthModule } from '@app/comman/auth/auth.module';
 import { PrismaModule } from '@app/comman/prisma/prisma.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { RabbitMQModule } from '@app/comman/rabbitmq/rabbitmq.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore }  from 'cache-manager-redis-yet';
 import { LoggingMiddleware } from '../../../libs/comman/src/middlewares/logging.middleware';
+import redisConfig from '@app/comman/rabbitmq/redis.config';
 
 
 @Module({
@@ -20,12 +20,10 @@ import { LoggingMiddleware } from '../../../libs/comman/src/middlewares/logging.
     PrismaModule,
     AuthModule,
     RabbitMQModule,
-    CacheModule.register({
-      isGlobal: true,
-      ttl: 6 * 10000,
-      store: redisStore, 
-      host: 'localhost',
-      port: 6379,
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: redisConfig,
+      inject: [ConfigService],
     }),
     ThrottlerModule.forRoot([{
       ttl: 60000,

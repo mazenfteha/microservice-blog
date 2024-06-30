@@ -18,6 +18,8 @@ services:
       - postgres
       - redis
       - rabbitmq
+    restart: unless-stopped
+
   post:
     build:
       context: .
@@ -36,6 +38,8 @@ services:
       - postgres
       - redis
       - rabbitmq  
+    restart: unless-stopped
+
   comment:
     build:
       context: .
@@ -54,6 +58,8 @@ services:
       - postgres
       - redis
       - rabbitmq
+    restart: unless-stopped
+
   bookmark:
     build:
       context: .
@@ -72,6 +78,9 @@ services:
       - postgres
       - redis
       - rabbitmq
+    restart: unless-stopped
+
+  
   notification:
     build:
       context: .
@@ -90,27 +99,37 @@ services:
       - postgres
       - redis
       - rabbitmq
+    restart: unless-stopped
+
   postgres:
-    image: postgres:alpine
+    image: postgres:alpine3.19
     environment:
-      POSTGRES_USER: prisma
-      POSTGRES_PASSWORD: prisma
-      POSTGRES_DB: prisma
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: microserviceblog
     ports:
       - '5432:5432'
     container_name: postgresql
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
   redis:
     image: redis:alpine
     ports:
       - '6379:6379'
     container_name: redis
+    restart: unless-stopped
+
   rabbitmq:
     image: rabbitmq
     ports:
       - '5672:5672'
+      - '15672:15672'
+    hostname: rabbitmq
     container_name: rabbitmq
+    restart: unless-stopped
+
   nginx-proxy:
     build:
       context: ./proxy
@@ -124,6 +143,8 @@ services:
     ports:
         - '80:80'
     container_name: nginx-proxy
+    restart: unless-stopped
 
 volumes:
   postgres_data:
+
