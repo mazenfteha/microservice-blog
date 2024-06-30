@@ -7,9 +7,13 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
     private channels: { [key: string]: amqp.Channel } = {};
 
     async onModuleInit() {
-        this.connection = await amqp.connect('amqp://localhost');
-        this.connection.on('connect', () => console.log('Connected to RabbitMQ'));
-        this.connection.on('disconnect', (err) => console.log('Disconnected from RabbitMQ', err));
+        while(this.connection == null) {
+            // replace localhost with rabbitmq container name
+            this.connection = await amqp.connect('amqp://localhost');
+            this.connection.on('connect', () => console.log('Connected to RabbitMQ'));
+            this.connection.on('disconnect', (err) => console.log('Disconnected from RabbitMQ', err));
+        }
+        
     }
 
     async onModuleDestroy() {
