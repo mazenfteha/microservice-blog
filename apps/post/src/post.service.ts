@@ -318,7 +318,7 @@ export class PostService {
       }
     })
 
-    await this.rabbitMQService.sendMessage('react.created', JSON.stringify(post));
+    await this.rabbitMQService.sendMessage('react.created', JSON.stringify(postReaction));
 
 
     return postReaction

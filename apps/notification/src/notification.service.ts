@@ -31,6 +31,7 @@ export class NotificationService implements OnModuleInit {
     where: { id: postReaction.userId },
     select: { email: true }
   });
+  console.log(postReaction)
 
   if (!userWhoLiked) {
     console.error("User who liked the post not found");
