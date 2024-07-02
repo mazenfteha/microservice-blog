@@ -7,7 +7,7 @@ services:
       target: development
     command: npm run start:dev
     env_file:
-      - .env
+      - .env.production
     ports:
       - "3000:3000"
     container_name: user
@@ -27,7 +27,7 @@ services:
       target: development
     command: npm run start:dev post
     env_file:
-      - .env
+      - .env.production
     ports:
       - "3001:3001"
     container_name: post
@@ -47,7 +47,7 @@ services:
       target: development
     command: npm run start:dev comment
     env_file:
-      - .env
+      - .env.production
     ports:
       - "3002:3002"
     container_name: comment
@@ -67,7 +67,7 @@ services:
       target: development
     command: npm run start:dev bookmark
     env_file:
-      - .env
+      - .env.production
     container_name: bookmark
     ports:
       - "3003:3003"
@@ -88,7 +88,7 @@ services:
       target: development
     command: npm run start:dev notification
     env_file:
-      - .env
+      - .env.production
     container_name: notification
     ports:
       - "3004:3004"
@@ -109,6 +109,8 @@ services:
       POSTGRES_DB: microserviceblog
     ports:
       - '5432:5432'
+    env_file:
+      - .env.production
     container_name: postgresql
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -119,6 +121,8 @@ services:
     ports:
       - '6379:6379'
     container_name: redis
+    env_file:
+      - .env.production
     restart: unless-stopped
 
   rabbitmq:
@@ -128,6 +132,8 @@ services:
       - '15672:15672'
     hostname: rabbitmq
     container_name: rabbitmq
+    env_file:
+      - .env.production
     restart: unless-stopped
 
   nginx-proxy:
@@ -141,7 +147,9 @@ services:
       - bookmark
       - notification
     ports:
-        - '80:80'
+        - '8080:8080'
+    env_file:
+      - .env.production
     container_name: nginx-proxy
     restart: unless-stopped
 
