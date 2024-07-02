@@ -11,6 +11,7 @@ import { RabbitMQModule } from '@app/comman/rabbitmq/rabbitmq.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { LoggingMiddleware } from '../../../libs/comman/src/middlewares/logging.middleware';
 import redisConfig from '@app/comman/rabbitmq/redis.config';
+import { ArgonService } from './argon.service';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import redisConfig from '@app/comman/rabbitmq/redis.config';
   controllers: [UserController],
   providers: [
     UserService,
+    ArgonService,
     Logger,
     {
       provide: APP_GUARD,

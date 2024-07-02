@@ -6,6 +6,7 @@ import { PrismaService } from '@app/comman/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { RabbitMQService } from '@app/comman/rabbitmq/rabbitmq.service';
 import { CloudinaryService } from '@app/comman/cloudinary/cloudinary.service';
+import { ArgonService } from './argon.service';
 
 const user = {
   name: 'test',
@@ -13,30 +14,35 @@ const user = {
   password: '12345678',
 };
 
-const EMAIL_ERROR = 'xxxxxxxxxxxxxxxx';
+// const EMAIL_ERROR = 'xxxxxxxxxxxxxxxx';
 
 const db = {
   user: {
-    create: (dto: any) => {
-      if (dto.data.email == EMAIL_ERROR) {
-        throw new Error();
-      }
-      return user;
-    },
+    create: jest.fn().mockResolvedValue(user),
+    findUnique: jest.fn().mockResolvedValue(user),
   },
 };
 
+const argon = {
+  hash: jest.fn().mockResolvedValue('hash'),
+  verify: jest.fn().mockResolvedValue(true),
+};
+
 const jwt = {
-  signAsync: jest.fn().mockResolvedValue(new Promise(() => 'token')),
+  signAsync: jest.fn().mockResolvedValue('token'),
 };
 
 describe('UserService', () => {
   let userService: UserService;
   let prisma: PrismaService;
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserService,
+        {
+          provide: ArgonService,
+          useValue: argon,
+        },
         { provide: JwtService, useValue: jwt },
         {
           provide: PrismaService,
@@ -44,7 +50,9 @@ describe('UserService', () => {
         },
         {
           provide: ConfigService,
-          useValue: {},
+          useValue: {
+            get: jest.fn().mockResolvedValue('secret'),
+          },
         },
         {
           provide: RabbitMQService,
@@ -80,15 +88,96 @@ describe('UserService', () => {
       expect(result).toHaveProperty('email');
       expect(result.name).toMatch(dto.name);
     });
+  });
 
-    it(' should throw error if email is already in use ', async () => {
+  describe('sign in', () => {
+    it('should sign in user', async () => {
+      const dto = {
+        email: 'tst@tst.com',
+        password: '12345678',
+      };
+      const result = await userService.signin(dto);
+      expect(result).toHaveProperty('access_token');
+      expect(prisma.user.findUnique).toHaveBeenCalledTimes(1);
+    });
+  });
+});
+
+const dbException = {
+  user: {
+    findUnique: jest.fn().mockResolvedValue(null),
+    create: jest.fn().mockImplementation(() => {
+      throw new Error();
+    }),
+  },
+};
+
+describe('user service handling exception ', () => {
+  let userService: UserService;
+  let prisma: PrismaService;
+  beforeAll(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        UserService,
+        {
+          provide: ArgonService,
+          useValue: argon,
+        },
+        { provide: JwtService, useValue: jwt },
+        {
+          provide: PrismaService,
+          useValue: dbException,
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockResolvedValue('secret'),
+          },
+        },
+        {
+          provide: RabbitMQService,
+          useValue: {
+            sendMessage: jest.fn(),
+          },
+        },
+        {
+          provide: CloudinaryService,
+          useValue: {},
+        },
+      ],
+    }).compile();
+
+    userService = module.get<UserService>(UserService);
+    prisma = module.get<PrismaService>(PrismaService);
+  });
+
+  it('should services to be defined', () => {
+    expect(userService).toBeDefined();
+    expect(prisma).toBeDefined();
+  });
+
+  describe('sign up with error', () => {
+    it('should throw error if email already exist', async () => {
       const dto: SignupDto = {
         name: 'test',
-        email: EMAIL_ERROR,
+        email: 'XXXXXXXXXXXX',
         password: '12345678',
       };
 
       await expect(userService.signup(dto)).rejects.toThrow();
+      expect(prisma.user.create).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('sign in with error', () => {
+    it('should throw error if email does not exist', async () => {
+      const dto = {
+        email: 'XXXXXXXXXXXX',
+        password: '12345678',
+      };
+
+      await expect(userService.signin(dto)).rejects.toThrow();
+      expect(prisma.user.findUnique).toHaveBeenCalledTimes(1);
     });
   });
 });
