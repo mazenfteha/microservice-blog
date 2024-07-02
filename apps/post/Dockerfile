@@ -28,4 +28,4 @@ COPY . .
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD ["node", "dist/apps/post/main"]
+CMD ["sleep 60 && node dist/apps/post/main"]

@@ -72,7 +72,7 @@ export class UserController {
     @GetUser('id') userId: number,
     @UploadedFile(
     new ParseFilePipeBuilder()
-        .addFileTypeValidator({ fileType: 'image/jpeg' })
+        .addFileTypeValidator({ fileType: /(jpg|jpeg|png|gif)$/ })
         .addMaxSizeValidator({ maxSize: MAX_PROFILE_PICTURE_SIZE_IN_BYTES })
         .build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }),
   ) file, ) {
@@ -147,6 +147,7 @@ export class UserController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @ApiResponse({ status: 200, description: 'Hello , world!' })
   sayHello(){
     return 'Hello World!';
   }

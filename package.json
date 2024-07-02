@@ -30,6 +30,8 @@
     "@nestjs/swagger": "^7.3.1",
     "@nestjs/throttler": "^5.1.2",
     "@prisma/client": "^5.13.0",
+    "@types/amqplib": "^0.10.5",
+    "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.4",
     "argon2": "^0.40.1",
     "cache-manager": "^5.6.1",
@@ -48,7 +50,7 @@
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
-    "@nestjs/testing": "^10.0.0",
+    "@nestjs/testing": "^10.3.9",
     "@types/csurf": "^1.11.5",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
