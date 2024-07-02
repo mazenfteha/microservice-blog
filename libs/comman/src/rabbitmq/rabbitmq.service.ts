@@ -8,6 +8,7 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
   private channels: { [key: string]: amqp.Channel } = {};
   constructor(private readonly configService: ConfigService) {}
 
+
   // Connect to RabbitMQ when the module is initialized
   async onModuleInit() {
     while (this.connection == null) {
@@ -17,7 +18,6 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
         if (env === 'production') {
           conn_url = 'amqp://rabbitmq:5672';
         }
-
         this.connection = await amqp.connect(conn_url);
         this.connection.on('connect', () =>
           console.log('Connected to RabbitMQ'),

@@ -166,6 +166,15 @@ $ npm install
 - Make sure to have Node.js version +16 , Nest.js , PostgreSQL , Redis , RabbitMQ and NGINX local in your machine 
 - Make sure to add a .env file in the root , you can check the .env_template file for a reference.
 
+## Database with PostgreSQL & prisma
+
+```
+npx prisma generate 
+npx prisma db push
+npx prisma studio
+``` 
+
+## Nest apps
 ```bash
 # watch mode
 $ npm run start:dev #(service name) (default is user service)
@@ -181,6 +190,7 @@ npm run start:dev bookmark
 npm run start:dev notification
 
 ```
+
 
 ## Test
 - Make sure to add .env.test in the root
