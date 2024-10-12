@@ -85,6 +85,8 @@ in this library I share  database , cloud , message broker services , logging mi
 
 - The server use PostgreSQL with Prisma as an ORM
 - All the Prisma services share to all services on the same Database
+- ERD and Tables found in `docs` folder
+- Schema found in `prisma` folder
 
 ## cloud service
 
@@ -98,21 +100,21 @@ in this library I share  database , cloud , message broker services , logging mi
     - Microservices communicates with each other using RabbitMQ via publisher and subscriber.
     - Each microservice is deployed into a docker container.
 - Services
-    - **User Registration**
+    - ### **User Registration**
         - **User Service** publishes a `user.created` message when a new user registers.
         - **Notification Service** listens for `user.created` messages and sends a welcome notification.
         
-        ### 3. **New Post Creation**
+    - ### **New Post Creation**
         
         - **Post Service** publishes a `post.created` message when a new post is created.
         - **Notification Service** listens for `post.created` messages and notifies followers.
         
-        ### **New Comment**
+    - ### **New Comment**
         
         - **Comment Service** publishes a `comment.created` message when a new comment is made.
         - **Notification Service** listens for `comment.created` messages to notify users that make comment on the same post that there is another comment
         
-        ### 7. **New Reaction (LIKE)**
+    - ### **New Reaction (LIKE)**
         
         - **post Service** publishes a `reaction.created` message when a new LIKE is added.
         - **Notification Service** listens for `reaction.created` messages to notify users that follow the person who like the post that the post is liked by him
@@ -166,9 +168,22 @@ $ npm install
 - Make sure to have Node.js version +16 , Nest.js , PostgreSQL , Redis , RabbitMQ and NGINX local in your machine 
 - Make sure to add a .env file in the root , you can check the .env_template file for a reference.
 
+## Database with PostgreSQL & prisma
+
+```bash
+# start
+npx prisma generate
+npx prisma migrate dev --name init  
+# if you want to edit anything in schema apply the changes and then to update schema and sync with posgresql :
+npx prisma db push
+# studio
+npx prisma studio
+``` 
+
+## Nest apps
 ```bash
 # watch mode
-$ npm run start:dev #(service name) (default is user service)
+npm run start:dev #(service name) (default is user service)
 # run user service
 npm run start:dev
 # run post service
@@ -181,6 +196,7 @@ npm run start:dev bookmark
 npm run start:dev notification
 
 ```
+
 
 ## Test
 - Make sure to add .env.test in the root

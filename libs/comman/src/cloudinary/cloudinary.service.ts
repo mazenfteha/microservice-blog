@@ -19,7 +19,9 @@ export class CloudinaryService {
             );
             uploadStream.end(imageBuffer);
         });
-    } async deleteImage(imageUrl: string): Promise<any> {
+    }
+
+    async deleteImage(imageUrl: string): Promise<any> {
         const publicId = this.extractPublicId(imageUrl);
         if (!publicId) {
             throw new Error('Invalid Cloudinary image URL');

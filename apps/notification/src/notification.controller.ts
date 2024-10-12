@@ -13,7 +13,7 @@ export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
   @ApiOperation({ summary: 'get all notifications' })
-  @ApiResponse({ status: 200, description: 'notifications retrived successfully'})
+  @ApiResponse({ status: 200, description: 'notifications retrieved successfully'})
   @ApiResponse({ status: 401, description: ' Unauthorized.' })
   @ApiResponse({ status: 400, description: 'Invalid input.' })
   @UseInterceptors(CacheInterceptor)

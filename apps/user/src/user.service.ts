@@ -1,7 +1,6 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { EditUserDto, SigninDto, SignupDto } from './dto';
 import { PrismaService } from '../../../libs/comman/src/prisma/prisma.service';
-import * as argon from 'argon2'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -9,6 +8,7 @@ import { CloudinaryService } from '../../../libs/comman/src/cloudinary/cloudinar
 import { CreateFollowDto } from './dto/create-follow.dto';
 import { DeleteFollowDto } from './dto/delete-follow.dto';
 import { RabbitMQService } from '@app/comman/rabbitmq/rabbitmq.service';
+import { ArgonService } from './argon.service';
 
 
 
@@ -19,13 +19,13 @@ export class UserService {
     private jwt: JwtService,
     private config: ConfigService,
     private readonly cloudinaryService: CloudinaryService,
-    private readonly rabbitMQService: RabbitMQService
-
+    private readonly rabbitMQService: RabbitMQService,
+    private readonly argonService : ArgonService
     ){}
   async signup(dto: SignupDto) {
     try {
       // generate the password hash
-      const hash = await argon.hash(dto.password)
+      const hash = await this.argonService.hash(dto.password)
       // save the new user in db
       const user = await this.prisma.user.create({
           data: {
@@ -67,7 +67,7 @@ export class UserService {
             throw new ForbiddenException(`User with this email ${email} does not exist`)
         }
         // compare password
-        const isMatch = await argon.verify(
+        const isMatch = await this.argonService.verify(
             user.password, 
             dto.password
             );
@@ -125,6 +125,7 @@ export class UserService {
       where: { id: userId },
       data: { profileImage: result.url },
     });
+    delete updatedUser.password
 
     return updatedUser;
 
@@ -300,7 +301,7 @@ export class UserService {
           }
         },
       });
-
+      
       return followers.map(follow => ({
         username: follow.follower.name,
         profilePicture: follow.follower.profileImage,

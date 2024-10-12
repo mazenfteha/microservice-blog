@@ -1,4 +1,4 @@
-.env file :
+.env or .env.production (for docker-compose) file :
 
 DATABASE_URL=
 JWT_SECRET=
