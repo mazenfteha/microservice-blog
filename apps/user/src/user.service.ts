@@ -1,4 +1,9 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { EditUserDto, SigninDto, SignupDto } from './dto';
 import { PrismaService } from '../../../libs/comman/src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -10,8 +15,6 @@ import { DeleteFollowDto } from './dto/delete-follow.dto';
 import { RabbitMQService } from '@app/comman/rabbitmq/rabbitmq.service';
 import { ArgonService } from './argon.service';
 
-
-
 @Injectable()
 export class UserService {
   constructor(
@@ -20,95 +23,131 @@ export class UserService {
     private config: ConfigService,
     private readonly cloudinaryService: CloudinaryService,
     private readonly rabbitMQService: RabbitMQService,
-    private readonly argonService : ArgonService
-    ){}
+    private readonly argonService: ArgonService,
+  ) {}
   async signup(dto: SignupDto) {
     try {
       // generate the password hash
-      const hash = await this.argonService.hash(dto.password)
+      const hash = await this.argonService.hash(dto.password);
       // save the new user in db
       const user = await this.prisma.user.create({
-          data: {
-              name: dto.name,
-              email: dto.email,
-              password: hash
-          }
-      })
-      delete user.password
+        data: {
+          name: dto.name,
+          email: dto.email,
+          password: hash,
+        },
+      });
+      delete user.password;
       //return the saved user
-      delete user.createdAt
-      delete user.updatedAt
+      delete user.createdAt;
+      delete user.updatedAt;
 
       await this.rabbitMQService.sendMessage(
         'user.created',
-        JSON.stringify(user)
+        JSON.stringify(user),
       );
 
       return user;
     } catch (error) {
-      if(error instanceof PrismaClientKnownRequestError){
-        if(error.code === 'P2002'){
-          throw new ForbiddenException('Email is already in use')
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new ForbiddenException('Email is already in use');
         }
       }
-      throw error
+      throw error;
     }
   }
 
   async signin(dto: SigninDto) {
-    const email = dto.email
-        const user = await this.prisma.user.findUnique({
-            where: {
-                email: email
-            }
-        })
-        // if user does not throw exception
-        if(!user) {
-            throw new ForbiddenException(`User with this email ${email} does not exist`)
-        }
-        // compare password
-        const isMatch = await this.argonService.verify(
-            user.password, 
-            dto.password
-            );
-        if(!isMatch){
-            throw new ForbiddenException('Credentials inccorect')
-        }
-        return this.signToken(user.id, user.email)
+    const email = dto.email;
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    // if user does not throw exception
+    if (!user) {
+      throw new ForbiddenException(
+        `User with this email ${email} does not exist`,
+      );
+    }
+    // compare password
+    const isMatch = await this.argonService.verify(user.password, dto.password);
+    if (!isMatch) {
+      throw new ForbiddenException('Credentials inccorect');
+    }
+    return this.signToken(user.id, user.email);
   }
 
-  async signToken(userId: number, email: string) : Promise<{access_token : string}>{
+  async signToken(
+    userId: number,
+    email: string,
+  ): Promise<{ access_token: string }> {
     const payload = {
-        userId: userId,
-        email: email
-    }
+      userId: userId,
+      email: email,
+    };
 
-    const secret = this.config.get('JWT_SECRET')
+    const secret = this.config.get('JWT_SECRET');
     const token = await this.jwt.signAsync(payload, {
-        secret: secret,
-        expiresIn: '1d'
-    })
+      secret: secret,
+      expiresIn: '1d',
+    });
 
     return {
-        access_token : token
-    }
+      access_token: token,
+    };
+  }
+
+  async getUserProfileById(userId: number) {
+    return await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        profileImage: true,
+        followers: {
+          select: {
+            follower: {
+              select : {
+                id: true,
+                name: true,
+                profileImage: true,
+              }
+            },
+          },
+        },
+        following: {
+          select: {
+            following: {
+              select : {
+                id: true,
+                name: true,
+                profileImage: true,
+              }
+            },
+          },
+        },
+      },
+    });
   }
 
   async editUser(userId: number, dto: EditUserDto) {
     const user = await this.prisma.user.update({
-      where:{
-          id:userId,
+      where: {
+        id: userId,
       },
       data: {
-          ...dto,
+        ...dto,
       },
-  });
-  delete user.password
-  return user;
+    });
+    delete user.password;
+    return user;
   }
 
-  
-  
   async updateUserProfileImage(userId: number, imageBuffer: Buffer) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -118,17 +157,19 @@ export class UserService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-     // Upload image to Cloudinary
-    const result = await this.cloudinaryService.uploadImage(imageBuffer, 'user_images');
+    // Upload image to Cloudinary
+    const result = await this.cloudinaryService.uploadImage(
+      imageBuffer,
+      'user_images',
+    );
 
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },
       data: { profileImage: result.url },
     });
-    delete updatedUser.password
+    delete updatedUser.password;
 
     return updatedUser;
-
   }
 
   async deleteUserProfileImage(userId: number) {
@@ -142,7 +183,7 @@ export class UserService {
 
     // Delete image from Cloudinary if user has a profile image
     if (user.profileImage) {
-      const publicId = user.profileImage
+      const publicId = user.profileImage;
       await this.cloudinaryService.deleteImage(publicId);
     }
 
@@ -155,18 +196,18 @@ export class UserService {
     return { message: 'Profile image deleted successfully' };
   }
 
-  async createFollow(userId : number, dto: CreateFollowDto) {
+  async createFollow(userId: number, dto: CreateFollowDto) {
     try {
+      // Ensure the user making the request is the follower
+      if (dto.followerId !== userId) {
+        throw new ConflictException(
+          'You can only follow on behalf of yourself',
+        );
+      }
 
-       // Ensure the user making the request is the follower
-    if (dto.followerId !== userId) {
-      throw new ConflictException('You can only follow on behalf of yourself');
-    }
-
-    if (dto.followerId === dto.followingId) {
-      throw new ConflictException("You can't follow yourself");
-    }
-
+      if (dto.followerId === dto.followingId) {
+        throw new ConflictException("You can't follow yourself");
+      }
 
       const follower = await this.prisma.user.findUnique({
         where: { id: dto.followerId },
@@ -176,55 +217,56 @@ export class UserService {
         throw new NotFoundException(`User with ID ${dto.followerId} not found`);
       }
 
-
       const following = await this.prisma.user.findUnique({
         where: { id: dto.followingId },
       });
 
       if (!following) {
-        throw new NotFoundException(`User with ID ${dto.followingId} not found`);
+        throw new NotFoundException(
+          `User with ID ${dto.followingId} not found`,
+        );
       }
-      
-          // Check if the follow relationship already exists
-    const existingFollow = await this.prisma.follow.findUnique({
-      where: {
-        followerId_followingId: {
+
+      // Check if the follow relationship already exists
+      const existingFollow = await this.prisma.follow.findUnique({
+        where: {
+          followerId_followingId: {
+            followerId: dto.followerId,
+            followingId: dto.followingId,
+          },
+        },
+      });
+
+      if (existingFollow) {
+        throw new ConflictException('You are already following this user');
+      }
+
+      const follow = await this.prisma.follow.create({
+        data: {
           followerId: dto.followerId,
           followingId: dto.followingId,
         },
-      },
-    });
+      });
 
-    if (existingFollow) {
-      throw new ConflictException('You are already following this user');
-    }
-
-    const follow = await this.prisma.follow.create({
-      data: {
-        followerId: dto.followerId,
-        followingId: dto.followingId,
-      },
-    });
-
-    await this.prisma.notification.create({
-      data: {
-        userId: dto.followingId,
-        type: 'NEW_FOLLOWER',
-        followId: follow.id
-      }
-    })
-    return follow;
-
+      await this.prisma.notification.create({
+        data: {
+          userId: dto.followingId,
+          type: 'NEW_FOLLOWER',
+          followId: follow.id,
+        },
+      });
+      return follow;
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
-  async deleteFollow(userId : number, dto: DeleteFollowDto) {
-    
+  async deleteFollow(userId: number, dto: DeleteFollowDto) {
     // Ensure the user making the request is the follower
     if (dto.followerId !== userId) {
-        throw new ConflictException('You can only unfollow on behalf of yourself');
+      throw new ConflictException(
+        'You can only unfollow on behalf of yourself',
+      );
     }
 
     if (dto.followerId === dto.followingId) {
@@ -240,26 +282,27 @@ export class UserService {
         throw new NotFoundException(`User with ID ${dto.followerId} not found`);
       }
 
-
       const following = await this.prisma.user.findUnique({
         where: { id: dto.followingId },
       });
 
       if (!following) {
-        throw new NotFoundException(`User with ID ${dto.followingId} not found`);
+        throw new NotFoundException(
+          `User with ID ${dto.followingId} not found`,
+        );
       }
 
-    // Check if the follow relationship already exists
-    const existingFollow = await this.prisma.follow.findUnique({
-      where: {
-        followerId_followingId: {
-          followerId: dto.followerId,
-          followingId: dto.followingId,
+      // Check if the follow relationship already exists
+      const existingFollow = await this.prisma.follow.findUnique({
+        where: {
+          followerId_followingId: {
+            followerId: dto.followerId,
+            followingId: dto.followingId,
+          },
         },
-      },
-    });
+      });
 
-    if (existingFollow) {
+      if (existingFollow) {
         await this.prisma.follow.delete({
           where: {
             followerId_followingId: {
@@ -268,12 +311,12 @@ export class UserService {
             },
           },
         });
-      return { message: "You are not following this user anymore" };
-    } else {
-      throw new ConflictException('You are not following this user');
-    }
+        return { message: 'You are not following this user anymore' };
+      } else {
+        throw new ConflictException('You are not following this user');
+      }
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
@@ -282,7 +325,7 @@ export class UserService {
       const user = await this.prisma.user.findUnique({
         where: { id: userId },
       });
-  
+
       if (!user) {
         throw new NotFoundException(`User with ID ${userId} not found`);
       }
@@ -293,22 +336,21 @@ export class UserService {
         },
         include: {
           follower: {
-            select : {
+            select: {
               id: true,
               name: true,
               profileImage: true,
-            }
-          }
+            },
+          },
         },
       });
-      
-      return followers.map(follow => ({
+
+      return followers.map((follow) => ({
         username: follow.follower.name,
         profilePicture: follow.follower.profileImage,
       }));
-
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
@@ -317,7 +359,7 @@ export class UserService {
       const user = await this.prisma.user.findUnique({
         where: { id: userId },
       });
-  
+
       if (!user) {
         throw new NotFoundException(`User with ID ${userId} not found`);
       }
@@ -328,24 +370,21 @@ export class UserService {
         },
         include: {
           following: {
-            select : {
+            select: {
               id: true,
               name: true,
               profileImage: true,
-            }
-          }
+            },
+          },
         },
       });
 
-      return followings.map(follow => ({
+      return followings.map((follow) => ({
         username: follow.following.name,
         profilePicture: follow.following.profileImage,
       }));
-
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 }
-
-
