@@ -203,7 +203,10 @@ npm run start:dev notification
 
 ```bash
 # unit tests
+## to run all test 
 $ npm run test
+## npm run test <service name>
+$ npm run test users
 
 # e2e tests (user service only)
 $ npm run test:e2e
